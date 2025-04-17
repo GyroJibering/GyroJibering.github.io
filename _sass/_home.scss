@@ -1,0 +1,55 @@
+.taxonomies-wrapper {
+  margin: 2em 0;
+  
+  .taxonomies {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      margin: 0.5em;
+    }
+    
+    .taxonomy {
+      display: inline-block;
+      padding: 0.5em 1em;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+}
+
+.education-content,
+.projects-content,
+.skills-content,
+.contact-content {
+  margin: 2em 0;
+  padding: 1em;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  
+  h3 {
+    margin-top: 1em;
+    color: #333;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding-left: 1em;
+    
+    li {
+      margin: 0.5em 0;
+    }
+  }
+} 

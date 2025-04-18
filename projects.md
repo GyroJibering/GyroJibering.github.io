@@ -1,8 +1,10 @@
 ---
-layout: page
+layout: default
 title: 项目经验
 permalink: /projects/
 ---
+
+{% include profile-nav.html %}
 
 ## 黑灰产治理项目
 **时间**：2025年1月 - 2025年4月  

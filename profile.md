@@ -7,22 +7,22 @@ permalink: /profile/
 <div class="taxonomies-wrapper">
   <ul class="taxonomies">
     <li>
-      <a class="taxonomy" href="#education">
+      <a class="taxonomy" href="/education/">
         <span>教育背景</span>
       </a>
     </li>
     <li>
-      <a class="taxonomy" href="#projects">
+      <a class="taxonomy" href="/projects/">
         <span>项目经验</span>
       </a>
     </li>
     <li>
-      <a class="taxonomy" href="#skills">
+      <a class="taxonomy" href="/skills/">
         <span>技能专长</span>
       </a>
     </li>
     <li>
-      <a class="taxonomy" href="#contact">
+      <a class="taxonomy" href="/contact/">
         <span>联系方式</span>
       </a>
     </li>

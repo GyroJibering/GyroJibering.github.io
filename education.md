@@ -1,8 +1,10 @@
 ---
-layout: page
+layout: default
 title: 教育背景
 permalink: /education/
 ---
+
+{% include profile-nav.html %}
 
 ## 本科在读（27届毕业生）
 - **学校**：上海市复旦大学

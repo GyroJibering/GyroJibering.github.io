@@ -30,8 +30,8 @@
 
 
   <body>
-
-    <div class="container pure-g"><div class="sidebar-left pure-u-1 pure-u-md-1-4" style="background-color: rgb(40, 73, 77); color: rgb(255, 255, 255); background-image: url(/bg.jpeg);"><header class="masthead">
+    <div class="page-wrapper">
+      <div class="container pure-g"><div class="sidebar-left pure-u-1 pure-u-md-1-4" style="background-color: rgb(40, 73, 77); color: rgb(255, 255, 255); background-image: url(/bg.jpeg);"><header class="masthead">
   <div class="avatar"><img src="/avatar.jpeg" class="avatar-image" alt="段光杰">
     </div>
   <div class="masthead-title">
@@ -41,28 +41,16 @@
     <small>Duan Guangjie</small>
   </div><nav class="navigation">
     <ul class="navigation-list"><li class="navigation-item">
-        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/education/">教育背景</a>
-      </li><li class="navigation-item">
-        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/projects/">项目经验</a>
-      </li><li class="navigation-item">
-        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/skills/">技能专长</a>
-      </li><li class="navigation-item">
-        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/contact/">联系方式</a>
+        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/education/">Profile</a>
       </li><li class="navigation-item">
         <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/blog/">Blog</a>
+      </li><li class="navigation-item">
+        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="/about/">About</a>
       </li></ul>
   </nav><div class="social pure-menu pure-menu-horizontal">
       <ul class="social-icons pure-menu-list">
       <li class="pure-menu-item">
-          <a class="social-icon pure-menu-link" href="mailto://vszhub@gmail.com">
-            <i class="fas fa-envelope" title="Email"></i>
-          </a>
-        </li><li class="pure-menu-item">
-          <a class="social-icon pure-menu-link" href="https://twitter.com/vszhub">
-            <i class="fab fa-twitter" title="Twitter"></i>
-          </a>
-        </li><li class="pure-menu-item">
-          <a class="social-icon pure-menu-link" href="https://github.com/vszhub/not-pure-poole">
+          <a class="social-icon pure-menu-link" href="https://github.com/GyroJibering">
             <i class="fab fa-github" title="GitHub"></i>
           </a>
         </li>
@@ -71,10 +59,123 @@
 </header>
 </div>
 
-      <div class="content pure-u-1 pure-u-md-1-2"><main>
-  <article class="page">
-  <h1 class="page-title">教育背景</h1>
-  <h2 id="本科在读27届毕业生">本科在读（27届毕业生）</h2>
+        <div class="content pure-u-1 pure-u-md-1-2"><main>
+  <div class="profile-nav-wrapper">
+  <div class="profile-nav-container">
+    <ul class="profile-nav">
+      <li>
+        <a href="/education/" class="active" style="
+          display: block;
+          text-decoration: none;
+          white-space: nowrap;
+          color: #495057;
+          padding: .5em 1em;
+          border-bottom: none;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+          font-size: 18px;
+          line-height: 1.5;
+        ">教育背景</a>
+      </li>
+      <li>
+        <a href="/projects/" class="" style="
+          display: block;
+          text-decoration: none;
+          white-space: nowrap;
+          color: #495057;
+          padding: .5em 1em;
+          border-bottom: none;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+          font-size: 18px;
+          line-height: 1.5;
+        ">项目经验</a>
+      </li>
+      <li>
+        <a href="/skills/" class="" style="
+          display: block;
+          text-decoration: none;
+          white-space: nowrap;
+          color: #495057;
+          padding: .5em 1em;
+          border-bottom: none;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+          font-size: 18px;
+          line-height: 1.5;
+        ">技能专长</a>
+      </li>
+      <li>
+        <a href="/contact/" class="" style="
+          display: block;
+          text-decoration: none;
+          white-space: nowrap;
+          color: #495057;
+          padding: .5em 1em;
+          border-bottom: none;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+          font-size: 18px;
+          line-height: 1.5;
+        ">联系方式</a>
+      </li>
+    </ul>
+    <div class="nav-shadow-line"></div>
+  </div>
+</div>
+
+<style>
+.profile-nav-wrapper {
+  margin-bottom: 2rem;
+}
+
+.profile-nav-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.profile-nav li {
+  margin: 0;
+}
+
+.profile-nav a {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.profile-nav a:hover,
+.profile-nav a.active {
+  color: #228be6;
+}
+
+.profile-nav a:hover::after,
+.profile-nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #228be6;
+}
+
+.nav-shadow-line {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #e9ecef;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+</style>
+
+<h2 id="本科在读27届毕业生">本科在读（27届毕业生）</h2>
 <ul>
   <li><strong>学校</strong>：上海市复旦大学</li>
   <li><strong>院系</strong>：计算机科学与技术学院</li>
@@ -89,18 +190,11 @@
   <li>在项目中主要负责爬取社交媒体平台数据，识别并打击软色情引流信息，有效遏制网络黑灰产</li>
 </ul>
 
-</article>
-
 </main>
-
-<footer class="footer"><small>
-    &copy; 2020&nbsp;-&nbsp;2025 <a href="https://github.com/your-github-username/">段光杰</a>. All rights reserved.
-    Powered by <a href="https://jekyllrb.com/">Jekyll</a> & <a href="https://github.com/vszhub/not-pure-poole">Not Pure Poole</a>.
-  </small>
-</footer>
 </div>
-      <div class="sidebar-right pure-u-1 pure-u-md-1-4">
+        <div class="sidebar-right pure-u-1 pure-u-md-1-4">
 </div>
+      </div>
     </div>
 
     <script async src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script><script>

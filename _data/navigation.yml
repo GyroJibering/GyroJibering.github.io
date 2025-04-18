@@ -1,10 +1,15 @@
-- title: 教育背景
+- title: Profile
   url: /education/
-- title: 项目经验
-  url: /projects/
-- title: 技能专长
-  url: /skills/
-- title: 联系方式
-  url: /contact/
+  children:
+    - title: 教育背景
+      url: /education/
+    - title: 项目经验
+      url: /projects/
+    - title: 技能专长
+      url: /skills/
+    - title: 联系方式
+      url: /contact/
 - title: Blog
   url: /blog/
+- title: About
+  url: /about/

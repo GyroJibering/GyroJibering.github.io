@@ -1,8 +1,10 @@
 ---
-layout: page
+layout: default
 title: 技能专长
 permalink: /skills/
 ---
+
+{% include profile-nav.html %}
 
 ## 编程语言
 - 熟练使用C/C++/Python编程语言，具备扎实的编程基础

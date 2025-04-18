@@ -1,8 +1,10 @@
 ---
-layout: page
+layout: default
 title: 联系方式
 permalink: /contact/
 ---
+
+{% include profile-nav.html %}
 
 ## 基本信息
 - **电话**：175 2125 7392

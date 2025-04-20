@@ -11,5 +11,12 @@
       url: /contact/
 - title: Blog
   url: /blog/
-- title: About
+- title: Something Fun
   url: /about/
+  children:
+    - title: 记忆配对
+      url: /about/
+    - title: 扫雷游戏
+      url: /minesweeper/
+    - title: 数字迷宫
+      url: /number-maze/

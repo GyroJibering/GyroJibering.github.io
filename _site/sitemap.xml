@@ -37,6 +37,12 @@
 <loc>http://localhost:4000/</loc>
 </url>
 <url>
+<loc>http://localhost:4000/minesweeper/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/number-maze/</loc>
+</url>
+<url>
 <loc>http://localhost:4000/profile/</loc>
 </url>
 <url>

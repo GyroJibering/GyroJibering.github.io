@@ -19,17 +19,24 @@ permalink: /education/
 使用Systemverilog设计五级流水线cpu，设计功能包括基础指令集：
 
 addi, xori, ori, andi, add, sub, and, or, xor
+
 addiw, addw, subw
+
 ld sd lb lh lw lbu lhu lwu sb sh sw lui
+
 beq bne blt bge bltu bgeu
+
 slti sltiu slli srli srai sll slt sltu srl sra slliw srliw sraiw sllw srlw sraw
+
 auipc jalr jal
 
 csr特权寄存器以及特权指令集、mmu以及中断与异常的处理操作
 
 获得A+成绩
 ![image](https://github.com/user-attachments/assets/9910ec57-7b70-4580-8097-a86dc9d6d965)
+
 链接：https://github.com/GyroJibering/arch
+
 ### 复旦大学系统软件与安全研究室黑灰产治理小组
 - 参与实验室学习和相关项目
 - 参与复旦大学"卓越杯"竞赛，荣获奖项

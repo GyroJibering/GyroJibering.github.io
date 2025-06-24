@@ -8,6 +8,7 @@ permalink: /skills/
 
 ## 编程语言
 - 熟练使用C/C++/Python编程语言，具备扎实的编程基础
+- 熟练使用硬件开发语言SystemVerilog
 
 ## 开发经验
 - 拥有QT平台开发经验，掌握数据库操作及开发技巧

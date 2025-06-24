@@ -8,7 +8,12 @@ permalink: /projects/
 ## 图书管理系统的设计
 这是一个基于QT开发的图书管理员系统，使用postgreSQL数据库。
 
-包含基本图书的添加、售卖、定价、搜索，管理员人员管理等功能，从设计到代码实现完善详细说明见该仓库
+该项目使用标准化数据库设计ER图，最简化数据的存储和关联逻辑的规范，然后使用QT的c++开发前后端
+
+包含基本图书的添加、售卖、定价、搜索，管理员人员管理等十分完善的功能
+
+从设计到代码实现完善详细说明见github仓库
+
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/Library)。
 
 ## 黑灰产治理项目
@@ -29,8 +34,6 @@ permalink: /projects/
 - 成功识别并打击大量软色情引流信息
 - 有效遏制网络黑灰产活动
 - 项目获得复旦大学"卓越杯"竞赛奖项
-
-## 项目仓库
 
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/BlibliCraweler)。
 

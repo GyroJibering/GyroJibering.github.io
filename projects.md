@@ -25,8 +25,8 @@ permalink: /projects/
 - 有效遏制网络黑灰产活动
 - 项目获得复旦大学"卓越杯"竞赛奖项
 
-该仓库只包含部分可复用的爬虫代码，非全部代码
-**项目仓库**：
+## 项目仓库
+
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/BlibliCraweler)。
 
 该仓库只包含部分可复用的爬虫代码，非全部代码

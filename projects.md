@@ -5,7 +5,7 @@ permalink: /projects/
 ---
 
 {% include profile-nav.html %}
-## 图书管理系统的设计
+## 1. 图书管理系统的设计
 这是一个基于QT开发的图书管理员系统，使用postgreSQL数据库。
 
 该项目使用标准化数据库设计ER图，最简化数据的存储和关联逻辑的规范，然后使用QT的c++开发前后端
@@ -16,7 +16,7 @@ permalink: /projects/
 
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/Library)。
 
-## 黑灰产治理项目
+## 2. 黑灰产治理项目
 **时间**：2025年1月 - 2025年4月  
 **项目描述**：参与复旦大学"卓越杯"竞赛，负责社交媒体平台数据爬取和黑灰产信息识别。  
 （该项目正在申请软著）

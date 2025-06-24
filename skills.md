@@ -24,4 +24,5 @@ permalink: /skills/
 - 熟练使用调试工具如gdb等
 - 熟练使用逆向工具如Ghidra、Die等
 - 擅长使用虚拟机，如VMware
-- 具备开发爬虫的能力，有使用过playwright架构编写爬虫项目经验 
+- 熟悉Docker的部署和使用
+- 具备基本爬虫和反爬虫开发的能力

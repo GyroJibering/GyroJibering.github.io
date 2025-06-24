@@ -15,8 +15,16 @@ permalink: /projects/
 从设计到代码实现完善详细说明见github仓库
 
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/Library)。
+## 2.risc-v五级流水线cpu设计
+使用Systemverilog设计五级流水线cpu，设计功能包括基础指令集、
+csr特权寄存器以及特权指令集、mmu以及中断与异常的处理操作
 
-## 2. 黑灰产治理项目
+该项目在计算机组成原理(H)课程中获得A+成绩
+![image](https://github.com/user-attachments/assets/9910ec57-7b70-4580-8097-a86dc9d6d965)
+
+本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/arch)。
+
+## 3. 黑灰产治理项目
 **时间**：2025年1月 - 2025年4月  
 **项目描述**：参与复旦大学"卓越杯"竞赛，负责社交媒体平台数据爬取和黑灰产信息识别。  
 （该项目正在申请软著）

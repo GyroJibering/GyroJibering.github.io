@@ -27,6 +27,6 @@ permalink: /projects/
 
 **代码链接**：
 该仓库只包含部分可复用的爬虫代码，非全部代码
-
-https://github.com/GyroJibering/BlibliCraweler
+## 项目仓库
+本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/BlibliCraweler)。
 

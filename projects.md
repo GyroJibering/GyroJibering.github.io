@@ -5,6 +5,11 @@ permalink: /projects/
 ---
 
 {% include profile-nav.html %}
+## 图书管理系统的设计
+这是一个基于QT开发的图书管理员系统，使用postgreSQL数据库。
+
+包含基本图书的添加、售卖、定价、搜索，管理员人员管理等功能，从设计到代码实现完善详细说明见该仓库
+本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/Library)。
 
 ## 黑灰产治理项目
 **时间**：2025年1月 - 2025年4月  

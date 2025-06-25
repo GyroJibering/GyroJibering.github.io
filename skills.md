@@ -22,7 +22,7 @@ permalink: /skills/
 - 熟练使用版本控制工具git，熟悉多人协作项目
 - 熟悉常用数据库，如mySQL、postgreSQL、mangoDB等
 - 熟练使用调试工具如gdb等
-- 熟练使用逆向工具如Ghidra、Die等
+- 熟练使用逆向工具如Ghidra、Die、JEB等
 - 擅长使用虚拟机，如VMware
 - 熟悉Docker的部署和使用
 - 具备基本爬虫和反爬虫开发的能力

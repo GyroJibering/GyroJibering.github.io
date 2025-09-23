@@ -1,4 +1,4 @@
-# WMCTF 2025 WP
+# WMCTF 2025 Web WP
 ## guess WP
 ### 首先，这个题目注册登录谁都会，所以我们直接看关键代码：
 ```python
@@ -112,6 +112,7 @@ payload如下：
     and 'os' in c.__init__.__globals__
 ))
 ```
+
 
 
 

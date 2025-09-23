@@ -1,9 +1,3 @@
----
-layout: page
-title: Blog
-permalink: /blog/
----
-
 # WMCTF 2025 WP
 ## guess WP
 ### 首先，这个题目注册登录谁都会，所以我们直接看关键代码：
@@ -118,6 +112,7 @@ payload如下：
     and 'os' in c.__init__.__globals__
 ))
 ```
+
 
 
 

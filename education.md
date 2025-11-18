@@ -25,4 +25,6 @@ permalink: /education/
 ### 2. 复旦大学六星战队Web手
 - W&MCTF 团队赛 16th place
 
+### 3. StarCrossedLovers战队队长
+- 带队参加datacon 2025，口令安全赛道第六名
 

@@ -27,7 +27,7 @@ permalink: /projects/
 
 ## 3. 黑灰产治理项目
 **时间**：2025 年 1 月 - 2025 年 4 月  
-**项目描述**：参与复旦大学"卓越杯"竞赛，负责社交媒体平台数据爬取和黑灰产信息识别（该项目正在申请软著）。
+**项目描述**：参与复旦大学"卓越杯"竞赛，负责社交媒体平台数据爬取和黑灰产信息识别
 
 **主要职责**：
 - 开发并优化数据爬虫系统，使用 Playwright 架构实现高效数据采集
@@ -48,3 +48,12 @@ permalink: /projects/
 本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/BlibliCraweler)。  
 > 注：该仓库只包含部分可复用的爬虫代码，非全部代码
 
+## 4. datacon 2025
+**时间**：2025/11/05 ~ 2025/11/12
+**项目描述**：口令安全赛道，对给定的用户密码进行在线破解和离线破解两种方式
+**获得成果**：最终成绩获得datacon全国二等奖
+
+**主要职责**：
+- 担任队长
+
+本项目具体代码托管在 [GitHub 仓库]([https://github.com/GyroJibering/arch](https://github.com/GyroJibering/datacon2025-StarCrossedLovers--))

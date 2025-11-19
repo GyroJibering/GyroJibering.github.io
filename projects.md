@@ -50,10 +50,13 @@ permalink: /projects/
 
 ## 4. datacon 2025
 **时间**：2025/11/05 ~ 2025/11/12
+
 **项目描述**：口令安全赛道，对给定的用户密码进行在线破解和离线破解两种方式
+
 **获得成果**：最终成绩获得datacon全国二等奖
 
 **主要职责**：
 - 担任队长
 
 本项目具体代码托管在 [GitHub 仓库]([https://github.com/GyroJibering/arch](https://github.com/GyroJibering/datacon2025-StarCrossedLovers--))
+

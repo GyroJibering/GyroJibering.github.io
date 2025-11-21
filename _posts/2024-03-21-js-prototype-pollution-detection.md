@@ -681,5 +681,5 @@ python3 ./ObjLupAnsys.py --nodejs -a --timeout 300 -q ../node_modules/ini-parser
 ![ObjLupAnsys检测结果](/img/jsproto/image.png)
 
 可以看到成功检测到了这个原型链污染。
-[yang](stone0721.github.io)联合创作
+[yang](http://stone0721.github.io)联合创作
 

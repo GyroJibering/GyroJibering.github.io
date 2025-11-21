@@ -261,7 +261,7 @@
   }
 }
 
-// Profile content pages (education, contact)
+// Profile content pages (education, contact, projects)
 .profile-content {
   display: flex;
   flex-direction: column;
@@ -274,6 +274,146 @@
   border: 1px solid rgba(0, 0, 0, .08);
   background: rgba(255, 255, 255, .9);
   box-shadow: 0 20px 45px rgba(15, 23, 42, .08);
+}
+
+.profile-search {
+  display: block;
+  margin-bottom: 1.5rem;
+  
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background: #fff;
+    color: var(--body-color);
+    transition: all 0.2s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 3px rgba(34, 139, 230, 0.1);
+    }
+  }
+}
+
+.profile-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer);
+  margin-top: var(--spacer);
+}
+
+.profile-project-item {
+  padding: var(--spacer);
+  border-radius: var(--border-radius);
+  background: rgba(248, 249, 250, .9);
+  border: 1px solid rgba(0, 0, 0, .04);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, .95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+  }
+}
+
+.profile-project-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacer);
+  margin-bottom: var(--spacer);
+  flex-wrap: wrap;
+}
+
+.profile-project-item__title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.3rem;
+  color: var(--heading-color);
+}
+
+.profile-project-item__date {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+}
+
+.profile-project-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.profile-project-item__tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  background: rgba(34, 139, 230, .12);
+  color: var(--blue);
+}
+
+.profile-project-item__excerpt {
+  margin: var(--spacer) 0;
+  color: var(--gray-700);
+  line-height: 1.7;
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, .6);
+}
+
+.profile-project-item__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacer);
+  flex-wrap: wrap;
+  margin-top: var(--spacer);
+}
+
+.profile-project-item__link,
+.profile-project-item__toggle {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.profile-project-item__link {
+  color: var(--link-color);
+  background: #fff;
+  
+  &:hover {
+    background: var(--link-color);
+    color: #fff;
+    border-color: var(--link-color);
+  }
+}
+
+.profile-project-item__toggle {
+  background: var(--link-color);
+  color: #fff;
+  border-color: var(--link-color);
+  
+  &:hover {
+    background: var(--link-hover-color);
+    border-color: var(--link-hover-color);
+  }
+}
+
+.profile-project-item__full {
+  margin-top: var(--spacer);
+  padding-top: var(--spacer);
+  border-top: 1px dashed rgba(0, 0, 0, .1);
+  
+  p:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .profile-section {
@@ -387,6 +527,62 @@
   .profile-item {
     background: rgba(255, 255, 255, .03);
     border-color: rgba(255, 255, 255, .08);
+  }
+  
+  .profile-search input {
+    background: rgba(255, 255, 255, .05);
+    border-color: rgba(255, 255, 255, .15);
+    color: var(--gray-300);
+    
+    &:focus {
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.2);
+    }
+  }
+  
+  .profile-project-item {
+    background: rgba(255, 255, 255, .05);
+    border-color: rgba(255, 255, 255, .08);
+    
+    &:hover {
+      background: rgba(255, 255, 255, .08);
+    }
+  }
+  
+  .profile-project-item__excerpt {
+    background: rgba(255, 255, 255, .03);
+    color: var(--gray-300);
+  }
+  
+  .profile-project-item__link {
+    background: rgba(255, 255, 255, .05);
+    border-color: rgba(255, 255, 255, .15);
+    color: var(--link-color);
+    
+    &:hover {
+      background: var(--link-color);
+      color: #fff;
+    }
+  }
+  
+  .profile-project-item__full {
+    border-top-color: rgba(255, 255, 255, .2);
+  }
+}
+
+@media (max-width: 40rem) {
+  .profile-project-item__actions {
+    flex-direction: column;
+  }
+  
+  .profile-project-item__link,
+  .profile-project-item__toggle {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .profile-project-item__header {
+    flex-direction: column;
   }
 }
 

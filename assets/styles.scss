@@ -261,6 +261,135 @@
   }
 }
 
+// Profile content pages (education, contact)
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-2);
+}
+
+.profile-content__panel {
+  padding: var(--spacer-2);
+  border-radius: calc(var(--border-radius) * 2);
+  border: 1px solid rgba(0, 0, 0, .08);
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, .08);
+}
+
+.profile-section {
+  margin-bottom: var(--spacer-2);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.profile-section__title {
+  margin: 0 0 var(--spacer) 0;
+  font-size: 1.5rem;
+  color: var(--heading-color);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.profile-section__content {
+  padding: var(--spacer);
+  border-radius: var(--border-radius);
+  background: rgba(248, 249, 250, .9);
+  border: 1px solid rgba(0, 0, 0, .04);
+  
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.8;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  p {
+    margin: 0.75rem 0;
+    line-height: 1.8;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.profile-item {
+  margin-bottom: var(--spacer);
+  padding: var(--spacer);
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, .6);
+  border: 1px solid rgba(0, 0, 0, .03);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+    color: var(--heading-color);
+  }
+  
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    
+    li {
+      margin-bottom: 0.4rem;
+      line-height: 1.7;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-content__panel {
+    background: rgba(15, 23, 42, .4);
+    border-color: rgba(255, 255, 255, .08);
+    box-shadow: none;
+  }
+  
+  .profile-section__title {
+    border-bottom-color: rgba(255, 255, 255, .15);
+  }
+  
+  .profile-section__content {
+    background: rgba(255, 255, 255, .05);
+    border-color: rgba(255, 255, 255, .08);
+    color: var(--gray-300);
+  }
+  
+  .profile-item {
+    background: rgba(255, 255, 255, .03);
+    border-color: rgba(255, 255, 255, .08);
+  }
+}
+
 // Sass for creating the swatches
 .colors {
   display: grid;

@@ -17,11 +17,6 @@ permalink: /profile/
       </a>
     </li>
     <li>
-      <a class="taxonomy" href="/skills/">
-        <span>技能专长</span>
-      </a>
-    </li>
-    <li>
       <a class="taxonomy" href="/contact/">
         <span>联系方式</span>
       </a>
@@ -54,23 +49,6 @@ permalink: /profile/
     - 成功识别并打击大量软色情引流信息
     - 有效遏制网络黑灰产活动
     - 项目获得复旦大学"卓越杯"竞赛奖项
-  </div>
-</div>
-
-<div id="skills">
-  <h2>技能专长</h2>
-  <div class="skills-content">
-    ### 编程语言
-    - 熟练使用C/C++/Python编程语言，具备扎实的编程基础
-
-    ### 开发经验
-    - 拥有QT平台开发经验，掌握数据库操作及开发技巧
-    - 有安卓以及C/C++程序逆向经验
-    - 熟悉逆向工程原理，具备丰富的程序逆向实践经验
-
-    ### 系统与工具
-    - 熟练操作Linux系统，有服务器部署经验
-    - 具备开发爬虫的能力，有使用过playwright架构编写爬虫项目经验
   </div>
 </div>
 

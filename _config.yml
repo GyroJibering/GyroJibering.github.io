@@ -1,6 +1,6 @@
 # Setup
-title: 段光杰
-description: Duan Guangjie
+title: GyroJ
+description: GyroJ
 url: https://gyrojibering.github.io
 avatar: /avatar.jpeg
 paginate: 5
@@ -35,7 +35,7 @@ twitter:
   card: summary
 logo: logo.png
 social:
-  name: 段光杰
+  name: GyroJ
   links: []
 google_site_verification: xxxxx
 lang: zh-CN
@@ -54,6 +54,6 @@ sass:
 
 # Specify the author for blog posts
 author:
-  name: 段光杰
-  url: https://github.com/your-github-username/
+  name: GyroJ
+  url: https://github.com/GyroJibering/
   email: your-email@example.com

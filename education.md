@@ -42,6 +42,7 @@ permalink: /education/
           <h3>2. 复旦大学六星战队Web手</h3>
           <ul>
             <li>W&MCTF 团队赛 16th place</li>
+            <li>FDUCTF2025 总负责人兼Web出题</li>
           </ul>
         </div>
         
@@ -55,6 +56,7 @@ permalink: /education/
     </div>
   </div>
 </section>
+
 
 
 

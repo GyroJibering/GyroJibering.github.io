@@ -74,8 +74,12 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   font-size: 18px;
   line-height: 1.5;
-  transition: all 0.2s ease;
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), color .3s ease;
   position: relative;
+}
+
+.profile-nav a:hover {
+  transform: translateY(-2px);
 }
 
 .profile-nav a:hover,
@@ -119,7 +123,7 @@
   border-radius: calc(var(--border-radius) * 1.5);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s cubic-bezier(0.4, 0, 0.2, 1), background .3s ease, color .3s ease, border-color .3s ease;
   border: 1px solid var(--border-color);
   background: #fff;
   color: var(--link-color);
@@ -130,8 +134,8 @@
   background: var(--link-color);
   color: #fff;
   border-color: var(--link-color);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(34, 139, 230, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(34, 139, 230, 0.3);
 }
 
 .page-nav-btn.disabled {

@@ -4,6 +4,12 @@ title: Blog
 permalink: /blog/
 ---
 
+<style>
+.page-title {
+  display: none;
+}
+</style>
+
 <section class="blog-explorer">
   <header class="blog-explorer__hero">
     <p>把所有写过的内容整理在一起，快速预览主题和亮点，点开即可查看完整细节。</p>

@@ -62,7 +62,7 @@ console.log(({}).toString);
 
 ### 1.OPG
 
-![OPG示例图](/assets/img/JS原型链污染/1.png)
+![OPG示例图](/img/jsproto/opg.png)
 
 左边是 Sink ，右边是 Source，中间的 蓝色箭头 赋值边，表示可控输入从 Source Cluster 赋值污染到 Sink Cluster
 
@@ -597,7 +597,7 @@ var parser = require('ini-parser');
 console.log(parser.parseFileSync('./CVE/test.ini'))
 ```
 
-![正常使用ini-parser](/assets/img/JS原型链污染/2.png)
+![正常使用ini-parser](/img/jsproto/image1.png)
 
 
 
@@ -615,7 +615,7 @@ console.log(parser.parseFileSync('./CVE/test.ini'))
 console.log({}.toString);
 ```
 
-![PoC验证结果](/assets/img/JS原型链污染/3.png)
+![PoC验证结果](/img/jsproto/image2.png)
 
 
 
@@ -678,7 +678,7 @@ module.exports = {
 python3 ./ObjLupAnsys.py --nodejs -a --timeout 300 -q ../node_modules/ini-parser/
 ```
 
-![ObjLupAnsys检测结果](/assets/img/JS原型链污染/4.png)
+![ObjLupAnsys检测结果](/img/jsproto/image.png)
 
 可以看到成功检测到了这个原型链污染。
 

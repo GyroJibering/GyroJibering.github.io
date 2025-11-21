@@ -2,8 +2,7 @@
 layout: post
 title: JS原型链污染漏洞检测
 date: 2025-11-21 00:00 +0800
-categories: [Web安全]
-tags: [JavaScript, 原型链污染, 安全研究, 静态分析]
+tags: [JavaScript, 原型链污染, 安全研究, 静态分析, Web安全]
 mathjax: true
 toc: true
 ---

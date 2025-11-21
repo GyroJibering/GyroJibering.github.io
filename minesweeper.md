@@ -1,18 +1,27 @@
 ---
-layout: default
-title: Minesweeper
+layout: page
+title: 扫雷游戏
 permalink: /minesweeper/
 ---
 
-<div class="profile-container">
-  <div class="profile-navigation">
-    <a href="/about/" class="profile-button">记忆配对</a>
-    <a href="/minesweeper/" class="profile-button active">扫雷游戏</a>
-    <a href="/number-maze/" class="profile-button">数字迷宫</a>
-  </div>
+<section class="profile-content">
+  <div class="profile-content__panel">
+    <div class="profile-section">
+      <h2 class="profile-section__title">游戏导航</h2>
+      <div class="profile-section__content">
+        <div class="game-navigation">
+          <a href="/about/" class="game-nav-btn">记忆配对</a>
+          <a href="/minesweeper/" class="game-nav-btn active">扫雷游戏</a>
+          <a href="/number-maze/" class="game-nav-btn">数字迷宫</a>
+          <a href="/dinosaur/" class="game-nav-btn">小恐龙</a>
+        </div>
+      </div>
+    </div>
 
-  <div class="game-container">
-    <h1>扫雷游戏</h1>
+    <div class="profile-section">
+      <h2 class="profile-section__title">扫雷游戏</h2>
+      <div class="profile-section__content">
+        <div class="game-container">
     <div class="game-info">
       <div class="mines">剩余雷数: <span id="mines">10</span></div>
       <div class="timer">用时: <span id="timer">0</span>秒</div>
@@ -25,49 +34,49 @@ permalink: /minesweeper/
         <option value="hard">困难 (30个雷)</option>
       </select>
     </div>
-    <div class="game-board" id="gameBoard"></div>
+          <div class="game-board" id="gameBoard"></div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <style>
-.profile-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.profile-navigation {
+.game-navigation {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
-.profile-button {
+.game-nav-btn {
   padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  background-color: #f8f9fa;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, .6);
   color: #495057;
-  border: 1px solid #e9ecef;
-  border-radius: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: calc(var(--border-radius) * 1.5);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s cubic-bezier(0.4, 0, 0.2, 1), background .3s ease, color .3s ease;
+  font-weight: 500;
 }
 
-.profile-button:hover {
-  background-color: #e9ecef;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.game-nav-btn:hover {
+  background-color: rgba(34, 139, 230, .1);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(34, 139, 230, .2);
 }
 
-.profile-button.active {
-  background-color: #228be6;
+.game-nav-btn.active {
+  background-color: var(--link-color);
   color: white;
-  border-color: #228be6;
+  border-color: var(--link-color);
 }
 
 .game-container {
   text-align: center;
+  padding: 1rem 0;
 }
 
 .game-info {
@@ -86,25 +95,25 @@ permalink: /minesweeper/
 }
 
 .game-button {
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  background-color: #228be6;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: var(--link-color);
   color: white;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: calc(var(--border-radius) * 1.5);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .game-button:hover {
-  background-color: #1c7ed6;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: var(--link-hover-color);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(34, 139, 230, .3);
 }
 
 .game-button:active {
-  transform: translateY(0);
-  box-shadow: none;
+  transform: translateY(-2px);
 }
 
 .game-select {

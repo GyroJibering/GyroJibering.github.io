@@ -1,7 +1,7 @@
 ---
 layout: post
 title: JS原型链污染漏洞检测
-date: 2025-11-21 00:00 +0800
+date: 2024-03-21 00:00 +0800
 tags: [JavaScript, 原型链污染, 安全研究, 静态分析, Web安全]
 mathjax: true
 toc: true
@@ -681,4 +681,5 @@ python3 ./ObjLupAnsys.py --nodejs -a --timeout 300 -q ../node_modules/ini-parser
 ![ObjLupAnsys检测结果](/img/jsproto/image.png)
 
 可以看到成功检测到了这个原型链污染。
+[yang](stone0721.github.io)联合创作
 

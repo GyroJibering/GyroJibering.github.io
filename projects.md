@@ -1,62 +1,102 @@
 ---
-layout: default
+layout: page
 title: 项目经验
 permalink: /projects/
 ---
 
-{% include profile-nav.html %}
-## 1. 图书管理系统的设计
-这是一个基于 QT 开发的图书管理员系统，使用 PostgreSQL 数据库。
+<section class="blog-explorer">
+  <header class="blog-explorer__hero">
+    <p>展示我参与过的项目经历，快速预览项目亮点和技术栈，点开即可查看完整细节。</p>
+    <label class="blog-search">
+      <span class="blog-search__label">搜索项目</span>
+      <input id="projects-search-input" type="search" placeholder="按标题、关键字过滤…" autocomplete="off">
+    </label>
+  </header>
 
-该项目使用标准化数据库设计 ER 图，最简化数据的存储和关联逻辑的规范，然后使用 QT 的 C++ 开发前后端。
+  <div class="blog-explorer__panel">
+    <div class="blog-explorer__list">
+    {% assign project_posts = "" | split: "" %}
+    {% for post in site.posts %}
+      {% if post.categories contains "项目" %}
+        {% assign project_posts = project_posts | push: post %}
+      {% endif %}
+    {% endfor %}
+    {% if project_posts == empty %}
+      <p class="blog-explorer__empty">暂时还没有项目，稍后再来看看吧。</p>
+    {% else %}
+      {% for post in project_posts %}
+        {% assign content_id = 'project-' | append: forloop.index0 %}
+        <article class="blog-card" data-post>
+          <header class="blog-card__header">
+            <div>
+              <p class="blog-card__date">{{ post.date | date: "%Y-%m-%d" }}</p>
+              <h2 class="blog-card__title">{{ post.title }}</h2>
+            </div>
+            <div class="blog-card__meta">
+              {% if post.categories.size > 0 %}
+                <span class="blog-card__chip">{{ post.categories | join: ' / ' }}</span>
+              {% endif %}
+              {% if post.tags %}
+                <span class="blog-card__chip blog-card__chip--ghost">{{ post.tags | join: ' · ' }}</span>
+              {% endif %}
+            </div>
+          </header>
 
-包含基本图书的添加、售卖、定价、搜索，管理员人员管理等十分完善的功能。
+          <p class="blog-card__excerpt">
+            {{ post.excerpt | strip_html | truncatewords: 42 }}
+          </p>
 
-从设计到代码实现完善详细说明见 GitHub 仓库。
+          <div class="blog-card__actions">
+            <a class="blog-card__link" href="{{ post.url | relative_url }}">
+              查看详情
+            </a>
+            <button class="blog-card__toggle" type="button" aria-expanded="false" aria-controls="{{ content_id }}" data-target="{{ content_id }}">
+              展开全文
+            </button>
+          </div>
 
-本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/Library)。
+          <div class="blog-card__full" id="{{ content_id }}" hidden>
+            {{ post.content }}
+          </div>
+        </article>
+        {% endfor %}
+    {% endif %}
+    </div>
+  </div>
+</section>
 
-## 2. RISC-V 五级流水线 CPU 设计
-使用 SystemVerilog 设计五级流水线 CPU，设计功能包括基础指令集、CSR 特权寄存器以及特权指令集、MMU 以及中断与异常的处理操作。
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('projects-search-input');
+    const cards = Array.from(document.querySelectorAll('[data-post]'));
 
-该项目在计算机组成原理（H）课程中获得 A+ 成绩。
+    function toggleCard(button) {
+      const target = document.getElementById(button.dataset.target);
+      if (!target) { return; }
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      button.textContent = expanded ? '展开全文' : '收起全文';
+      target.hidden = expanded;
+    }
 
-![image](https://github.com/user-attachments/assets/9910ec57-7b70-4580-8097-a86dc9d6d965)
+    cards.forEach((card) => {
+      const button = card.querySelector('.blog-card__toggle');
+      if (button) {
+        button.addEventListener('click', () => toggleCard(button));
+      }
+    });
 
-本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/arch)。
-
-## 3. 黑灰产治理项目
-**时间**：2025 年 1 月 - 2025 年 4 月  
-**项目描述**：参与复旦大学"卓越杯"竞赛，负责社交媒体平台数据爬取和黑灰产信息识别
-
-**主要职责**：
-- 开发并优化数据爬虫系统，使用 Playwright 架构实现高效数据采集
-- 设计并实现软色情引流信息的识别算法
-- 分析数据特征，建立有效的黑灰产信息识别模型
-- 参与系统优化，提高识别准确率和处理效率
-
-**获得经验**：
-- Playwright 框架的爬虫部署
-- MangoDB 数据库的数据存储对接
-- 团队协作的分工与协作方式
-
-**项目成果**：
-- 成功识别并打击大量软色情引流信息
-- 有效遏制网络黑灰产活动
-- 项目获得复旦大学"卓越杯"竞赛奖项
-
-本项目的源代码托管在 [GitHub 仓库](https://github.com/GyroJibering/BlibliCraweler)。  
-> 注：该仓库只包含部分可复用的爬虫代码，非全部代码
-
-## 4. datacon 2025
-**时间**：2025/11/05 ~ 2025/11/12
-
-**项目描述**：口令安全赛道，对给定的用户密码进行在线破解和离线破解两种方式
-
-**获得成果**：最终成绩获得datacon全国二等奖
-
-**主要职责**：
-- 担任队长
-
-本项目具体代码托管在 [GitHub 仓库]([https://github.com/GyroJibering/arch](https://github.com/GyroJibering/datacon2025-StarCrossedLovers--))
+    if (searchInput) {
+      const normalize = (text) => text.toLowerCase().replace(/\s+/g, ' ').trim();
+      searchInput.addEventListener('input', (event) => {
+        const keyword = normalize(event.target.value);
+        cards.forEach((card) => {
+          const text = normalize(card.textContent || '');
+          const match = !keyword || text.includes(keyword);
+          card.style.display = match ? '' : 'none';
+        });
+      });
+    }
+  });
+</script>
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: CeleRace CTF Web题目详解 - Celery任务队列RCE攻击链
+title: 强网杯2025 CeleRace详解 - Celery任务队列RCE攻击链
 date: 2025-11-22 00:00 +0800
 tags: [CTF, Web安全, Celery, RCE, 漏洞分析]
 toc: true

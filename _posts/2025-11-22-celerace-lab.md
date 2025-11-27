@@ -3,7 +3,7 @@ layout: post
 title: CeleRace Lab - Celery Race Condition & RCE 靶场
 date: 2025-11-22 00:00 +0800
 categories: [项目]
-tags: [Celery, 漏洞复现, CTF, Web安全, Docker, Next.js, Flask]
+tags: [漏洞复现, CTF, Web安全, Next.js, Flask]
 ---
 
 这是一个基于 Next.js 和 Flask 的漏洞复现环境，旨在模拟 `Celery` 异步任务队列中的复杂攻击链。

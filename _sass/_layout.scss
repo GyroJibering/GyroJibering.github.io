@@ -2,15 +2,9 @@
 //
 // Styles for managing the structural hierarchy of the site.
 
-.page-wrapper {
-  background: transparent;
-  min-height: 100vh;
-}
-
 .container {
   padding: 0;
   margin: 0;
-  background: transparent;
 }
 
 .home-header {
@@ -25,7 +19,6 @@
   margin-left:  auto;
   margin-right: auto;
   min-height: 100vh;
-  background: transparent;
 }
 
 .sidebar-left {
@@ -33,7 +26,6 @@
   padding: var(--spacer);
   background: center / cover;
   height: 100vh;
-  background-color: transparent;
 }
 
 footer {

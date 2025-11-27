@@ -1,8 +1,9 @@
 ---
 layout: post
 title: JS原型链污染漏洞检测
-date: 2024-03-21 00:00 +0800
-tags: [JavaScript, 原型链污染, 安全研究, 静态分析, Web安全]
+date: 2025-11-21 00:00 +0800
+categories: [Web安全]
+tags: [JavaScript, 原型链污染, 安全研究, 静态分析]
 mathjax: true
 toc: true
 ---
@@ -62,7 +63,7 @@ console.log(({}).toString);
 
 ### 1.OPG
 
-![OPG示例图](/img/jsproto/opg.png)
+<img src="/img/jsproto/opg.png" alt="OPG示例图" style="max-width: 80%; height: auto; display: block; margin: 1rem auto; border-radius: 8px;">
 
 左边是 Sink ，右边是 Source，中间的 蓝色箭头 赋值边，表示可控输入从 Source Cluster 赋值污染到 Sink Cluster
 
@@ -71,8 +72,6 @@ console.log(({}).toString);
 第一轮递归 p 赋值 为 `__proto__` ，第二轮递归 p 赋值为 `toString`，第三轮递归完成对这个`toString` 赋值  `toString = b['__proto__']['toString']` 。
 
 通过 OPG，能够清晰地描绘出数据如何在不同对象和它们的属性之间流动，具备精确分析的基础。
-
-
 
 ### 2.对象查找分析 Object Lookup Analysis
 
@@ -84,8 +83,6 @@ console.log(({}).toString);
 
 如果访问 `source[*]` 说明 `source ` 可能有任意属性，这样实现扩展 Source Cluster
 
-
-
 #### 3.Sink Cluster Expansion
 
 **目标：** 识别并构建一个“被污染的目标”的集合。
@@ -93,8 +90,6 @@ console.log(({}).toString);
 Sink 是污染目标，初始化为 JavaScript 内置函数的原型（如 `Object.prototype`）。
 
 当分析过程中遇到对敏感属性的读取操作时，分析器会主动将该对象原型链上的节点也纳入 Sink 集合，以此来捕获间接的污染行为。
-
-
 
 #### 4.Constraint Collection and Solving
 
@@ -105,8 +100,6 @@ Sink 是污染目标，初始化为 JavaScript 内置函数的原型（如 `Obje
 使用一个约束求解器判断所有的对齐条件是否能同时成立。
 
 如上图将 第一轮递归的 p 与   `__proto__`  对齐，第二轮递归的 p 与  `toString` 对齐
-
-
 
 ## ObjLupAnsys 源码分析
 
@@ -244,11 +237,7 @@ class HandleUnaryOp(Handler):
 
 `HandleArray` 创建一个 对象节点，`HandleArrayElem` 建立属性边
 
-
-
 在 DFS 遍历完 AST 之后，OPG 就构建成功。 
-
-
 
 ### 2.Source and Sink Cluster Expansion
 
@@ -268,8 +257,6 @@ Sink 初始化：定义初始 Sink 集合，为 Javascript 内置对象的原型
     G.pollutable_name_nodes = set(chain(*
         [G.get_prop_name_nodes(p) for p in G.builtin_prototypes]))
 ```
-
-
 
 `handle_prop` ：`find_prop` 的入口，同时进行 Source 、Sink Cluster Expansion
 
@@ -358,11 +345,7 @@ def handle_prop(G, ast_node, side=None, extra=ExtraInfo()) \
 
 **Sink Cluster Expansion：** 检查 `parent_obj` 是否属于 `builtin_prototypes`，直接识别对敏感原型的访问。如果检测到代码正在访问内置原型的属性，将此次访问标记为 Sink 
 
-
-
-
-
-### **3. Object Lookup Analysis**
+### 3. Object Lookup Analysis
 
 `find_prop` 进行对象查找分析
 
@@ -444,10 +427,6 @@ def find_prop(G, parent_objs, prop_name, branches=None,
 
 第三、四、五、六步处理通配符，处理用户输入的未知属性（ Source Cluster Expansion ），如果属性不存在，会在 OPG 中创建新的属性节点，模拟 Javascript 动态添加属性的行为。
 
-
-
-
-
 污点传播：`add_contributes_to` ，当数据从一个节点流向另一个节点，比如赋值操作时，在 OPG 中添加 `CONTRIBUTES_TO` 数据流边，并将 `tainted`标记 从源节点传递到目标节点。
 
 ```python
@@ -466,13 +445,9 @@ def add_contributes_to(G: Graph, sources, target, operation: str=None,
         G.set_node_attr(target, ('tainted', True))
 ```
 
-
-
 ### 4.Constraint Collection and Solving
 
 当分析器检测到一个潜在的原型链污染时，需要收集从 Source到 Sink 的完整路径，并对其进行验证。
-
-
 
 路径回溯：`traceback` 从 Sink 开始，沿着数据流边反向追溯，构建完整的污染链。
 
@@ -518,8 +493,6 @@ def traceback(G, vul_type, start_node=None):
     return ret_pathes, res_path, caller_list
 ```
 
-
-
 约束验证：收集到的路径需要经过验证，以排除误报。`check` 函数作为验证入口，根据约束对路径进行检查。
 
 ```python
@@ -554,8 +527,6 @@ def check(self, path):
 
 只有当一条污染路径满足所有预设的约束条件时，系统才会最终将其报告为一个真实可信的漏洞。
 
-
-
 ## CVE 分析
 
 ```
@@ -569,8 +540,6 @@ ini-parser		0.0.2		index.js(Line 14)		CVE-2020-7617
 ```shell
 npm i ini-parser@0.0.2
 ```
-
-
 
 ### 正常使用
 
@@ -597,9 +566,7 @@ var parser = require('ini-parser');
 console.log(parser.parseFileSync('./CVE/test.ini'))
 ```
 
-![正常使用ini-parser](/img/jsproto/image1.png)
-
-
+<img src="/img/jsproto/image1.png" alt="正常使用ini-parser" style="max-width: 80%; height: auto; display: block; margin: 1rem auto; border-radius: 8px;">
 
 ### PoC
 
@@ -615,9 +582,7 @@ console.log(parser.parseFileSync('./CVE/test.ini'))
 console.log({}.toString);
 ```
 
-![PoC验证结果](/img/jsproto/image2.png)
-
-
+<img src="/img/jsproto/image2.png" alt="PoC验证结果" style="max-width: 80%; height: auto; display: block; margin: 1rem auto; border-radius: 8px;">
 
 ### 源码分析
 
@@ -670,15 +635,13 @@ module.exports = {
 
 原型链污染：匹配组名和属性时没有限制，导致创建对象和属性时可以使用 `__proto__` ，`constructor`，`prototype` 通过原型链污染原型对象。
 
-
-
 ### 使用 ObjLupAnsys 检测
 
 ```shell
 python3 ./ObjLupAnsys.py --nodejs -a --timeout 300 -q ../node_modules/ini-parser/
 ```
 
-![ObjLupAnsys检测结果](/img/jsproto/image.png)
+<img src="/img/jsproto/image.png" alt="ObjLupAnsys检测结果" style="max-width: 80%; height: auto; display: block; margin: 1rem auto; border-radius: 8px;">
 
 可以看到成功检测到了这个原型链污染。
 [yang](http://stone0721.github.io)联合创作

@@ -30,7 +30,9 @@
   --body-font-size: 18px;
   --body-line-height: 1.5;
   --body-color: var(--gray-900);
+  --body-color-rgb: 33, 37, 41;
   --body-bg: var(--gray-100);
+  --heading-color-rgb: 33, 37, 41;
 
   --text-font: Times, "Times New Roman", "Free Serif", "Noto Serif", TimesNewRomanPSMT, "Droid Serif";
 
@@ -38,6 +40,7 @@
   --link-hover-color: #1c7ed6;
 
   --heading-color: var(--gray-900);
+  --heading-color-rgb: 33, 37, 41;
 
   --border-color: var(--gray-300);
   --border-radius: .25rem;
@@ -54,9 +57,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --body-color: var(--gray-300);
+    --body-color-rgb: 222, 226, 230;
     --body-bg: var(--gray-800);
+    --heading-color-rgb: 255, 255, 255;
 
     --heading-color: #fff;
+    --heading-color-rgb: 255, 255, 255;
 
     --link-color: var(--blue-300);
     --link-hover-color: var(--blue-400);

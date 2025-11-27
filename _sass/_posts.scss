@@ -12,6 +12,7 @@
 .post {
   font-family: var(--text-font);
   margin-bottom: 4em;
+  background: transparent;
 
   h1, h2, h3, h4, h5, h6, .post-meta {
     font-family: var(--body-font);
@@ -19,6 +20,15 @@
 
   li + li {
     margin-top: .25rem;
+  }
+  
+  // 文字半透明
+  p, li, td, th, span, div {
+    color: rgba(var(--body-color-rgb, 33, 37, 41), 0.85);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(var(--heading-color-rgb, 33, 37, 41), 0.9);
   }
 }
 

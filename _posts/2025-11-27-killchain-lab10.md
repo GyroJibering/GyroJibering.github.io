@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 安全攻防综合实验 lab10
+title: 安全攻防综合实验 lab10 killchain
 date: 2025-11-27 00:00 +0800
 categories: [Web安全]
 tags: [SQL注入, 文件上传, 提权, Linux, Windows, 渗透测试]

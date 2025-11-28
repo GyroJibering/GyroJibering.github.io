@@ -39,7 +39,7 @@ permalink: /education/
         </div>
         
         <div class="profile-item">
-          <h3>2. 复旦大学六星战队Web手</h3>
+          <h3>2. 复旦大学六星战队Web、Reverse手</h3>
           <ul>
             <li>W&MCTF 团队赛 16th place</li>
             <li>FDUCTF2025 总负责人兼Web出题</li>

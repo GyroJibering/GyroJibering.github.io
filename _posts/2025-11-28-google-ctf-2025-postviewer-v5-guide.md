@@ -8,7 +8,7 @@ toc: true
 author: GyroJ
 ---
 
-本文档基于官方 Writeup (by @terjanq) 编写，整合了深度原理解析与基于 Docker 的完整复现教程。
+本文档基于官方 Writeup (by @terjanq) 编写，整合了深度原理解析与基于 Docker 的漏洞复现教程。
 
 ---
 

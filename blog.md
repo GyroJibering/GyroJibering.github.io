@@ -8,73 +8,6 @@ permalink: /blog/
 .page-title {
   display: none;
 }
-
-/* 分页控件样式，复用 profile-nav 风格 */
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
-}
-
-.pagination-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  height: 2.5rem;
-  padding: 0 0.75rem;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.8);
-  color: var(--link-color);
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.pagination-btn:hover:not(:disabled):not(.active) {
-  background: var(--link-color);
-  color: #fff;
-  border-color: var(--link-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 139, 230, 0.3);
-}
-
-.pagination-btn.active {
-  background: var(--link-color);
-  color: #fff;
-  border-color: var(--link-color);
-  cursor: default;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--gray-600);
-  box-shadow: none;
-  transform: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  .pagination-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: var(--gray-300);
-  }
-  
-  .pagination-btn:hover:not(:disabled):not(.active),
-  .pagination-btn.active {
-    background: var(--link-color);
-    color: #fff;
-    border-color: var(--link-color);
-  }
-}
 </style>
 
 <section class="blog-explorer">
@@ -146,7 +79,6 @@ permalink: /blog/
     const searchInput = document.getElementById('blog-search-input');
     const allCards = Array.from(document.querySelectorAll('[data-post]'));
     const paginationContainer = document.getElementById('pagination-controls');
-    const blogList = document.getElementById('blog-list');
     
     // 分页配置
     const itemsPerPage = 10;
@@ -185,15 +117,13 @@ permalink: /blog/
 
       // 上一页按钮
       const prevBtn = document.createElement('button');
-      prevBtn.className = 'pagination-btn';
+      prevBtn.className = 'page-nav-btn'; // 使用全局样式
       prevBtn.innerHTML = '←';
       prevBtn.disabled = currentPage === 1;
       prevBtn.addEventListener('click', () => changePage(currentPage - 1));
       paginationContainer.appendChild(prevBtn);
 
       // 页码按钮
-      // 简单的页码逻辑：显示所有页码（如果页数很多，可以后续优化为 1 2 ... 9 10）
-      // 这里为了样式美观，最多显示5个页码
       let startPage = Math.max(1, currentPage - 2);
       let endPage = Math.min(totalPages, startPage + 4);
       
@@ -203,7 +133,7 @@ permalink: /blog/
 
       if (startPage > 1) {
          const firstBtn = document.createElement('button');
-         firstBtn.className = 'pagination-btn';
+         firstBtn.className = 'page-nav-btn'; // 使用全局样式
          firstBtn.textContent = '1';
          firstBtn.addEventListener('click', () => changePage(1));
          paginationContainer.appendChild(firstBtn);
@@ -212,13 +142,14 @@ permalink: /blog/
            const dots = document.createElement('span');
            dots.textContent = '...';
            dots.style.opacity = '0.5';
+           dots.style.margin = '0 0.2rem';
            paginationContainer.appendChild(dots);
          }
       }
 
       for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement('button');
-        btn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+        btn.className = `page-nav-btn ${i === currentPage ? 'active' : ''}`; // 使用全局样式
         btn.textContent = i;
         if (i !== currentPage) {
           btn.addEventListener('click', () => changePage(i));
@@ -231,11 +162,12 @@ permalink: /blog/
            const dots = document.createElement('span');
            dots.textContent = '...';
            dots.style.opacity = '0.5';
+           dots.style.margin = '0 0.2rem';
            paginationContainer.appendChild(dots);
          }
          
          const lastBtn = document.createElement('button');
-         lastBtn.className = 'pagination-btn';
+         lastBtn.className = 'page-nav-btn'; // 使用全局样式
          lastBtn.textContent = totalPages;
          lastBtn.addEventListener('click', () => changePage(totalPages));
          paginationContainer.appendChild(lastBtn);
@@ -243,7 +175,7 @@ permalink: /blog/
 
       // 下一页按钮
       const nextBtn = document.createElement('button');
-      nextBtn.className = 'pagination-btn';
+      nextBtn.className = 'page-nav-btn'; // 使用全局样式
       nextBtn.innerHTML = '→';
       nextBtn.disabled = currentPage === totalPages;
       nextBtn.addEventListener('click', () => changePage(currentPage + 1));
@@ -287,23 +219,17 @@ permalink: /blog/
         const keyword = normalize(event.target.value);
         
         if (!keyword) {
-          // 搜索清空，恢复全部分页显示
           visibleCards = [...allCards];
-          // 保持当前页或重置为1？重置为1通常比较合理
           currentPage = 1; 
           updateDisplay();
           return;
         }
 
-        // 搜索模式：过滤卡片
         visibleCards = allCards.filter(card => {
           const text = normalize(card.textContent || '');
           return text.includes(keyword);
         });
 
-        // 搜索模式下，分页：如果结果超过10个，依然分页？
-        // 用户需求是“搜索过滤”，通常搜索结果不强制分页，但如果结果很多，分页也无妨。
-        // 这里为了统一体验，搜索结果也进行分页。
         currentPage = 1;
         updateDisplay();
       });

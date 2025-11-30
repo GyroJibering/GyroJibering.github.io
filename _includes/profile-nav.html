@@ -68,7 +68,7 @@
   display: block;
   text-decoration: none;
   white-space: nowrap;
-  color: #495057;
+  color: var(--gray-300); /* Dark mode text color */
   padding: .5em 1em;
   border-bottom: none;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
@@ -84,7 +84,7 @@
 
 .profile-nav a:hover,
 .profile-nav a.active {
-  color: #228be6;
+  color: var(--link-color); /* Use link color (blue-300 in dark mode) */
 }
 
 .profile-nav a:hover::after,
@@ -95,7 +95,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #228be6;
+  background-color: var(--link-color);
 }
 
 .nav-shadow-line {
@@ -104,8 +104,8 @@
   left: 0;
   right: 0;
   height: 1px;
-  background-color: #e9ecef;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  background-color: rgba(255, 255, 255, 0.15); /* Dark mode divider */
+  box-shadow: none;
 }
 
 .profile-page-nav {
@@ -124,8 +124,8 @@
   text-decoration: none;
   font-weight: 500;
   transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .3s cubic-bezier(0.4, 0, 0.2, 1), background .3s ease, color .3s ease, border-color .3s ease;
-  border: 1px solid var(--border-color);
-  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--link-color);
   font-size: 0.95rem;
 }
@@ -159,6 +159,7 @@
   }
 }
 
+/* 
 @media (prefers-color-scheme: dark) {
   .page-nav-btn {
     background: rgba(255, 255, 255, 0.05);
@@ -170,5 +171,6 @@
     background: var(--link-color);
     color: #fff;
   }
-}
+} 
+*/
 </style> 

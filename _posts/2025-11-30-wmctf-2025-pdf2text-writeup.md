@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "WMCTF 2025 Writeup: pdf2text 题目详解"
-date: 2025-09-23 00:00 +0800
+date: 2025-11-30 00:00 +0800
 categories: [CTF, Web安全]
 tags: [PDF, Polyglot, Python, RCE, 漏洞复现]
 toc: true

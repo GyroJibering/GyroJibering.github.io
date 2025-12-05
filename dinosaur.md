@@ -14,6 +14,7 @@ permalink: /dinosaur/
           <a href="/minesweeper/" class="game-nav-btn">扫雷游戏</a>
           <a href="/number-maze/" class="game-nav-btn">数字迷宫</a>
           <a href="/dinosaur/" class="game-nav-btn active">小恐龙</a>
+          <a href="http://114.55.15.44:8080/" class="game-nav-btn" target="_blank">战争模拟</a>
         </div>
       </div>
     </div>

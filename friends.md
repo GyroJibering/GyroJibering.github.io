@@ -10,43 +10,58 @@ permalink: /friends/
       <h2 class="profile-section__title">友链</h2>
       <div class="profile-section__content">
         <div class="friends-list">
-          <div class="friend-item">
-            <h3 class="friend-name">
-              <a href="https://juryorca.github.io" target="_blank" rel="noopener noreferrer">Juryorca</a>
-            </h3>
-            <p class="friend-description">
-              <strong>Pwn领域专家来啦！</strong><br>
-              这位是深耕pwn领域的专家Juryorca大神，超级大神py，又称瑞幸首席幸运官lucky！
-            </p>
-            <p class="friend-link">
-              <a href="https://juryorca.github.io" target="_blank" rel="noopener noreferrer">个人主页链接 →</a>
-            </p>
+          <div class="friend-card">
+            <div class="friend-card__avatar">
+              <img src="/img/friends/Juryorca.png" alt="Juryorca" class="friend-avatar">
+            </div>
+            <div class="friend-card__content">
+              <h3 class="friend-card__name">
+                <a href="https://juryorca.github.io" target="_blank" rel="noopener noreferrer">Juryorca</a>
+              </h3>
+              <p class="friend-card__title">Pwn领域专家来啦！</p>
+              <p class="friend-card__description">
+                这位是深耕pwn领域的专家Juryorca大神，超级大神py，又称瑞幸首席幸运官lucky！
+              </p>
+              <a href="https://juryorca.github.io" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+                访问主页 →
+              </a>
+            </div>
           </div>
 
-          <div class="friend-item">
-            <h3 class="friend-name">
-              <a href="https://lunaticquasimodo.top/link" target="_blank" rel="noopener noreferrer">LunaticQuasimodo</a>
-            </h3>
-            <p class="friend-description">
-              <strong>Web大神</strong><br>
-              LunaticQuasimodo，web大神；Pwn大神。
-            </p>
-            <p class="friend-link">
-              <a href="https://lunaticquasimodo.top/link" target="_blank" rel="noopener noreferrer">个人主页 →</a>
-            </p>
+          <div class="friend-card">
+            <div class="friend-card__avatar">
+              <img src="/img/friends/lunaticQusimodo.jpg" alt="LunaticQuasimodo" class="friend-avatar">
+            </div>
+            <div class="friend-card__content">
+              <h3 class="friend-card__name">
+                <a href="https://lunaticquasimodo.top/link" target="_blank" rel="noopener noreferrer">LunaticQuasimodo</a>
+              </h3>
+              <p class="friend-card__title">Web大神</p>
+              <p class="friend-card__description">
+                LunaticQuasimodo，web大神；Pwn大神。
+              </p>
+              <a href="https://lunaticquasimodo.top/link" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+                访问主页 →
+              </a>
+            </div>
           </div>
 
-          <div class="friend-item">
-            <h3 class="friend-name">
-              <a href="https://www.cameudis.com/" target="_blank" rel="noopener noreferrer">Y2</a>
-            </h3>
-            <p class="friend-description">
-              <strong>Pwn大神 Y2 来啦！</strong><br>
-              Sixstars的老队长，今年刚刚获得blackhat世界总冠军！无数fduer CTF的引路人，真正的大神。同时是知名偶像乐团的鼓手sama。
-            </p>
-            <p class="friend-link">
-              <a href="https://www.cameudis.com/" target="_blank" rel="noopener noreferrer">个人主页链接 →</a>
-            </p>
+          <div class="friend-card">
+            <div class="friend-card__avatar">
+              <img src="/img/friends/yy.png" alt="Y2" class="friend-avatar">
+            </div>
+            <div class="friend-card__content">
+              <h3 class="friend-card__name">
+                <a href="https://www.cameudis.com/" target="_blank" rel="noopener noreferrer">Y2</a>
+              </h3>
+              <p class="friend-card__title">Pwn大神 Y2 来啦！</p>
+              <p class="friend-card__description">
+                Sixstars的老队长，今年刚刚获得blackhat世界总冠军！无数fduer CTF的引路人，真正的大神。同时是知名偶像乐团的鼓手sama。
+              </p>
+              <a href="https://www.cameudis.com/" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+                访问主页 →
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -56,84 +71,168 @@ permalink: /friends/
 
 <style>
 .friends-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacer-2);
+  margin-top: var(--spacer);
+}
+
+.friend-card {
   display: flex;
   flex-direction: column;
-  gap: var(--spacer-2);
+  align-items: center;
+  padding: var(--spacer-2);
+  border-radius: calc(var(--border-radius) * 2);
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.friend-item {
-  padding: var(--spacer);
-  border-radius: var(--border-radius);
-  background: rgba(255, 255, 255, .1);
-  border: 1px solid rgba(255, 255, 255, .15);
+.friend-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(34, 139, 230, .8), rgba(18, 184, 134, .8));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.friend-card:hover {
+  background: rgba(255, 255, 255, .12);
+  border-color: rgba(255, 255, 255, .2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+  transform: translateY(-4px);
+}
+
+.friend-card:hover::before {
+  opacity: 1;
+}
+
+.friend-card__avatar {
+  width: 120px;
+  height: 120px;
+  margin-bottom: var(--spacer);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.friend-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, .2);
   transition: all 0.3s ease;
-}
-
-.friend-item:hover {
-  background: rgba(255, 255, 255, .15);
-  border-color: rgba(255, 255, 255, .25);
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
 }
 
-.friend-name {
-  margin: 0 0 var(--spacer) 0;
-  font-size: 1.3rem;
+.friend-card:hover .friend-avatar {
+  border-color: rgba(34, 139, 230, .6);
+  box-shadow: 0 6px 20px rgba(34, 139, 230, .4);
+  transform: scale(1.05);
+}
+
+.friend-card__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.friend-card__name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--heading-color);
 }
 
-.friend-name a {
+.friend-card__name a {
   color: var(--link-color);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.friend-name a:hover {
+.friend-card__name a:hover {
   color: var(--link-hover-color);
-  text-decoration: underline;
 }
 
-.friend-description {
+.friend-card__title {
+  margin: 0 0 var(--spacer) 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(34, 139, 230, .9);
+  opacity: 0.9;
+}
+
+.friend-card__description {
   margin: 0 0 var(--spacer) 0;
   line-height: 1.7;
   color: var(--gray-300);
+  font-size: 0.95rem;
+  flex: 1;
 }
 
-.friend-description strong {
-  color: var(--heading-color);
-  font-size: 1.05em;
-}
-
-.friend-link {
-  margin: var(--spacer) 0 0 0;
-}
-
-.friend-link a {
+.friend-card__link {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: var(--border-radius);
+  margin-top: auto;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
   background: rgba(34, 139, 230, .2);
   color: var(--link-color);
   text-decoration: none;
-  transition: all 0.2s ease;
+  font-weight: 500;
+  transition: all 0.3s ease;
   border: 1px solid rgba(34, 139, 230, .3);
+  align-self: center;
 }
 
-.friend-link a:hover {
+.friend-card__link:hover {
   background: var(--link-color);
   color: #fff;
   border-color: var(--link-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(34, 139, 230, .3);
+  box-shadow: 0 6px 16px rgba(34, 139, 230, .4);
 }
 
 @media (max-width: 40rem) {
-  .friend-item {
-    padding: calc(var(--spacer) * 0.75);
+  .friends-list {
+    grid-template-columns: 1fr;
+    gap: var(--spacer);
   }
   
-  .friend-name {
-    font-size: 1.1rem;
+  .friend-card {
+    padding: var(--spacer);
+  }
+  
+  .friend-card__avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .friend-card__name {
+    font-size: 1.3rem;
+  }
+  
+  .friend-card__description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .friends-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .friends-list {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 </style>

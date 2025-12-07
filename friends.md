@@ -76,7 +76,7 @@ permalink: /friends/
               <p class="friend-card__description">
                 计算机领域大神，算法大神，从二年级就开始学算法的顶级ACM选手。
               </p>
-              <a href="#" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+              <a href="https://www.cnblogs.com/Hencecho" target="_blank" rel="noopener noreferrer" class="friend-card__link">
                 访问主页 →
               </a>
             </div>

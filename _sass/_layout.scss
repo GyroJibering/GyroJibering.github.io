@@ -38,16 +38,13 @@ footer {
     padding-top: var(--spacer-3);
     padding-left: var(--spacer-3);
     padding-right: var(--spacer-3);
-    margin-left: 320px;
-    width: calc(100% - 320px);
+    margin-left: 25%;
   }
 
   .sidebar-left {
     position: fixed;
     top: 0;
     bottom: 0;
-    width: 320px;
-    overflow-y: auto;
   }
 
   .home-header {
@@ -58,17 +55,6 @@ footer {
 @media (min-width: $lg-width) {
   .sidebar-right {
     display: block;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 320px;
-    overflow-y: auto;
-  }
-
-  .content {
-    width: calc(100% - 640px);
-    margin-right: 320px;
   }
 }
 
@@ -81,5 +67,11 @@ footer {
 @media (max-width: $md-width) {
   .content {
     width: 100%;
+  }
+}
+
+@media (min-width: $md-width) and (max-width: $lg-width) {
+  .content {
+    width: 75%;
   }
 }

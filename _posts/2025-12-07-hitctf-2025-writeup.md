@@ -322,7 +322,7 @@ flag{H4ck1nggggg_Pd0__en9in4_1fb9e382436}
 
 # Misc
 ## 5-Layer-Fog | LunaticQuasimodo
-```python=
+```python
 #!/usr/bin/env python3
 import subprocess
 import base64
@@ -1401,7 +1401,7 @@ Flag 的校验逻辑分散在字节码中，主要分为两部分：
 
 ## ExceptionKey
 frida hook 绕过反调试，直接拿到加密的参数
-```javascript=
+```javascript
 function readStdString(ptrString) {
     try {
         const ptrSize = Process.pointerSize;
@@ -1803,7 +1803,7 @@ Interceptor.attach(ptr("0x00BB15C0"), {
 ```
 
 解密：
-```python=
+```python
 #!/usr/bin/env python3
 
 # 从Frida获取的v5实际数据（48字节）
@@ -1888,7 +1888,7 @@ if '{' in flag_ascii and '}' in flag_ascii:
 <img src="https://hackmd.io/_uploads/SJpwlDZzWe.png" alt="image" style="max-width: 80%; height: auto; display: block; margin: 1rem auto; border-radius: 8px;">
 
 得到完整信息如下：
-```python=
+```python
 import math
 
 # 1. 从截图中提取的十六进制数值 (已清理)
@@ -1927,7 +1927,7 @@ else:
 ```
 
 然后嘛我找到了一串文本文件，它也有一个美丽的名字，叫做 aa70c4ccdf80416d922eb41a67594218.txt，里面是密文，解密得到明文：
-```python=
+```python
 import base64
 
 # --- 从上一步恢复的 RSA 密钥参数 ---
@@ -1974,14 +1974,14 @@ except UnicodeDecodeError:
     print("\n[!] Decryption resulted in non-UTF-8 bytes. Here is the raw output:")
     print(plaintext_bytes)
 ```
-flag 就是 CTF{!@#$-buxiangwanle-%^&*}
+flag 就是 `CTF{!@#$-buxiangwanle-%^&*}`
 逆天吧，你不想玩我更不想玩（恼）。
 
 ## Scan4fLaG
 
-逆天出题人，扫码得到 WDNucjN6X3U0ZHNfTk5FX0NaS18yMDI1 base64 解码得到 X3nr3z_u4ds_NNE_CZK_2025，png 尾部附着一个加密文件。
+逆天出题人，扫码得到 `WDNucjN6X3U0ZHNfTk5FX0NaS18yMDI1` base64 解码得到 `X3nr3z_u4ds_NNE_CZK_2025`，png 尾部附着一个加密文件。
 
-实际上是 X3nr3z_u4ds_NNE_CZK_2025 用 fLaG  维尼吉亚解密得到  S3cr3t_p4ss_HIT_CTF_2025，属实逆天。
+实际上是 `X3nr3z_u4ds_NNE_CZK_2025` 用 `fLaG`  维尼吉亚解密得到  `S3cr3t_p4ss_HIT_CTF_2025`，属实逆天。
 
-然后这就是密码，可以打开里面的 fLaG 得到 flag，是 HITCTF2025{v1genere_qr_zip}
+然后这就是密码，可以打开里面的 `fLaG` 得到 flag，是 `HITCTF2025{v1genere_qr_zip}`
 

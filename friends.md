@@ -38,9 +38,9 @@ permalink: /friends/
               </h3>
               <p class="friend-card__title">Web大神</p>
               <p class="friend-card__description">
-                LunaticQuasimodo，web大神；Pwn大神。
+                LunaticQuasimodo 一位高调的白客，个人主页十分精美，征婚中，有意向的自己联系。
               </p>
-              <a href="https://lunaticquasimodo.top/link" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+              <a href="https://lunaticquasimodo.top" target="_blank" rel="noopener noreferrer" class="friend-card__link">
                 访问主页 →
               </a>
             </div>

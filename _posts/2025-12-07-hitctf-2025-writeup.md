@@ -1,12 +1,15 @@
 ---
 layout: post
-title: HITCTF 2025 Writeup
+title: HITCTF 2025 Writeup——by sixstars
 date: 2025-12-07
 categories: [CTF]
-tags: [Web安全, Pwn, Reverse, Crypto, Misc, SQL注入, VM逆向, 竞态条件]
+tags: [CTF, write-up, sixstars]
 toc: true
 author: GyroJ
 ---
+
+哈工大HITCTF
+本次比赛题目还可以，六星战队大家都很努力，虽然只拿了14名，今后再接再厉。
 
 # Web
 ## Impossible SQL | GyroJ

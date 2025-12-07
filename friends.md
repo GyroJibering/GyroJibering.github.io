@@ -56,7 +56,7 @@ permalink: /friends/
               </h3>
               <p class="friend-card__title">Pwn大神 Y2 来啦！</p>
               <p class="friend-card__description">
-                Sixstars的老队长，今年刚刚获得blackhat世界总冠军！无数fduer CTF的引路人，真正的大神。同时是知名偶像乐团的鼓手sama。
+                Sixstars的老队长，2025 blackhat世界总冠军！无数fduer CTF的引路人，真正的大神。同时是知名偶像乐团的鼓手sama。
               </p>
               <a href="https://www.cameudis.com/" target="_blank" rel="noopener noreferrer" class="friend-card__link">
                 访问主页 →

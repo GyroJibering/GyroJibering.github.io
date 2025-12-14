@@ -1,7 +1,7 @@
 ---
 layout: post
 title: HITCTF 2025 logserver 详解——SQLite execute() 场景下的错误注入
-date: 2025-12-10
+date: 2025-12-14
 categories: [CTF]
 tags: [CTF, write-up, SQL注入, SQLite, 错误注入, SSTI, HITCTF]
 toc: true

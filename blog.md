@@ -13,7 +13,7 @@ permalink: /blog/
 <section class="blog-explorer">
   <header class="blog-explorer__hero">
     <div class="blog-hero-header">
-      <p>欢迎大家加入我的 Discord 交流博客！</p>
+      <p>欢迎大家加入我的 Discord 交流博客！ ----></p>
       <a href="https://discord.gg/CWg9Tu6mDt" target="_blank" rel="noopener noreferrer" class="discord-link">
         <i class="fab fa-discord"></i>
       </a>

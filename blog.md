@@ -13,6 +13,12 @@ permalink: /blog/
 <section class="blog-explorer">
   <header class="blog-explorer__hero">
     <p>把所有写过的内容整理在一起，快速预览主题和亮点，点开即可查看完整细节。</p>
+    <div class="blog-discord-link">
+      <a href="https://discord.gg/CWg9Tu6mDt" target="_blank" rel="noopener noreferrer" class="discord-link">
+        <i class="fab fa-discord"></i>
+        <span>加入 Discord 交流</span>
+      </a>
+    </div>
     <label class="blog-search">
       <span class="blog-search__label">搜索文章</span>
       <input id="blog-search-input" type="search" placeholder="按标题、关键字过滤…" autocomplete="off">

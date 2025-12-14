@@ -9,7 +9,7 @@ author: GyroJ
 ---
 
 > 面向 **后端 / 安全 / 开发岗面试**
-> ORM、SQL 注入、PDO、CORS、XSS、CSRF、SSRF、XXE、本地/横向提权
+> SQL 注入、PDO、CORS、XSS、CSRF、SSRF、XXE、本地/横向提权
 > 计划长期更新，这算是一本《永乐大典》吗？
 
 ---

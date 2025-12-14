@@ -12,7 +12,7 @@ permalink: /blog/
 
 <section class="blog-explorer">
   <header class="blog-explorer__hero">
-    <p>把所有写过的内容整理在一起，快速预览主题和亮点，点开即可查看完整细节。</p>
+    <p>欢迎大家加入我的 Discord 交流博客！</p>
     <div class="blog-discord-link">
       <a href="https://discord.gg/CWg9Tu6mDt" target="_blank" rel="noopener noreferrer" class="discord-link">
         <i class="fab fa-discord"></i>

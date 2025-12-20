@@ -265,7 +265,7 @@ http://target.com/page#<img src=x onerror=alert(1)>
 详细一点解释：
 CSRF 的产生源于浏览器对 Cookie 的自动携带机制，同源策略仅限制响应读取而不限制请求发送；SameSite Cookie 是现代防御核心，而一旦存在 XSS，CSRF 防护将被完全绕过；JSONP 则是历史上绕过同源策略、放大 CSRF 与信息泄露风险的典型设计缺陷。
 
-#### 面试遇到的问题：为什么后端api使用json不能完全防住csrf
+### 面试遇到的问题：为什么后端api使用json不能完全防住csrf
 原理上出发：传统csrf是使用浏览器直接发送表单，不能发送json数据，如果要发送json数据，就必须要调取JS，但是调取JS的过程中受到CORS的阻碍
 
 CSRF 并不是不能发送 JSON，而是在没有 XSS 的前提下，浏览器不允许跨站页面构造并发送携带 application/json 的请求；因此“JSON API 看起来不容易被 CSRF”是浏览器安全模型的副作用，而不是 JSON 自身的安全性。
@@ -299,11 +299,11 @@ cross-site POST	                  ❌
 >***JSON API 防 CSRF”的效果，其实是 SameSite=Lax 带来的副作用
 SameSite 控制“带不带 Cookie”，CORS 控制“JS 能不能读响应”。***
 
-##### 一句话总结
+### 一句话总结
 在跨站场景下，提交 JSON 的 POST 请求是否携带 Cookie，取决于 Cookie 的 SameSite 属性而非 JSON 本身；在 SameSite=Lax 或 Strict 下，浏览器会阻止携带 Cookie，从而使 JSON 型 CSRF 失效，而在 SameSite=None 下则不会。
 
 绕过方法：在表单中提交参数text={json数据}，后端解析的时候有可能会将其解析为json
-##### 补充
+### 补充
 JSONP 是一种利用 `script` 标签绕过同源策略、允许跨域读取数据的历史方案；它本身不具备任何安全防护能力，也无法绕过 SameSite；在 SameSite=None 的情况下，JSONP 会自动携带 Cookie 并读取登录态数据，因此在现代安全实践中应当彻底禁用。
 
 ## HTTP相关漏洞

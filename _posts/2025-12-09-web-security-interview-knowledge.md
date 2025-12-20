@@ -352,6 +352,7 @@ RFC中有一句原话：
 hop by hop的header会被删除，删除的时间节点在HTTP 解析完成之后、转发请求生成之前
 
 >***凡是被 Connection 声明过的字段，都不能转发***
+
 #### 强网杯2025 Secret Vault
 一个python的web app。flask。有个go的鉴权服务器。这个服务器有个后端，来自```github.com/gorilla/mux```，有一段签名逻辑，开在4444端口
 

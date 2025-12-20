@@ -255,7 +255,7 @@ http://target.com/page#<img src=x onerror=alert(1)>
 #的作用：
 不会发送到服务器：片段标识符（即#之后的内容）不会被包含在HTTP请求中。也就是说，当浏览器向服务器请求```http://target.com/page```时，#后面的部分不会发送到服务器，而是由客户端（浏览器）保留并使用。
 客户端处理：由于片段标识符不会发送到服务器，因此服务器无法直接控制或访问它。它完全由客户端处理。这意味着，如果网页中的JavaScript代码读取了window.location.hash并进行了不安全的内嵌或执行，就可能导致安全问题（例如XSS）。
->**检测工具:** XSStrike、Burp Suite、AWVS
+>检测工具: XSStrike、Burp Suite、AWVS
 ---
 
 ## CSRF
@@ -302,7 +302,7 @@ SameSite 控制“带不带 Cookie”，CORS 控制“JS 能不能读响应”�
 
 绕过方法：在表单中提交参数text={json数据}，后端解析的时候有可能会将其解析为json
 ##### 补充
-JSONP 是一种利用 ```<script>``` 标签绕过同源策略、允许跨域读取数据的历史方案；它本身不具备任何安全防护能力，也无法绕过 SameSite；在 SameSite=None 的情况下，JSONP 会自动携带 Cookie 并读取登录态数据，因此在现代安全实践中应当彻底禁用。
+JSONP 是一种利用 `<script>` 标签绕过同源策略、允许跨域读取数据的历史方案；它本身不具备任何安全防护能力，也无法绕过 SameSite；在 SameSite=None 的情况下，JSONP 会自动携带 Cookie 并读取登录态数据，因此在现代安全实践中应当彻底禁用。
 
 ## HTTP相关漏洞
 ### http请求头走私

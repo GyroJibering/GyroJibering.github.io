@@ -286,7 +286,7 @@ Samesite的简单介绍：
 2. SameSite=Lax（默认，最容易被误解）
 行为规则（必须记住）
 场景	是否带 Cookie
-```
+```python
 same-site	                  ✅
 cross-site GET（顶级导航）	  ✅
 cross-site POST	                  ❌
@@ -302,7 +302,7 @@ SameSite 控制“带不带 Cookie”，CORS 控制“JS 能不能读响应”�
 
 绕过方法：在表单中提交参数text={json数据}，后端解析的时候有可能会将其解析为json
 ##### 补充
-JSONP 是一种利用 `<script>` 标签绕过同源策略、允许跨域读取数据的历史方案；它本身不具备任何安全防护能力，也无法绕过 SameSite；在 SameSite=None 的情况下，JSONP 会自动携带 Cookie 并读取登录态数据，因此在现代安全实践中应当彻底禁用。
+JSONP 是一种利用 `script` 标签绕过同源策略、允许跨域读取数据的历史方案；它本身不具备任何安全防护能力，也无法绕过 SameSite；在 SameSite=None 的情况下，JSONP 会自动携带 Cookie 并读取登录态数据，因此在现代安全实践中应当彻底禁用。
 
 ## HTTP相关漏洞
 ### http请求头走私

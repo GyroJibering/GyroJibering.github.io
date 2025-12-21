@@ -27,7 +27,7 @@ DDL/DCL, 只能通过最小权限原则、黑白名单来处理
 
 
 
->ORM（Object Relational Mapping）通过对象模型映射关系数据库，自动生成 SQL 并负责参数绑定。你不再手写 SQL，而是用代码操作"对象"，ORM 帮你安全地拼 SQL。
+>***ORM（Object Relational Mapping）通过对象模型映射关系数据库，自动生成 SQL 并负责参数绑定。你不再手写 SQL，而是用代码操作"对象"，ORM 帮你安全地拼 SQL***。
 
 ---
 ### SQL注入绕过技巧
@@ -283,7 +283,8 @@ http://target.com/page#<img src=x onerror=alert(1)>
 #的作用：
 不会发送到服务器：片段标识符（即#之后的内容）不会被包含在HTTP请求中。也就是说，当浏览器向服务器请求```http://target.com/page```时，#后面的部分不会发送到服务器，而是由客户端（浏览器）保留并使用。
 客户端处理：由于片段标识符不会发送到服务器，因此服务器无法直接控制或访问它。它完全由客户端处理。这意味着，如果网页中的JavaScript代码读取了window.location.hash并进行了不安全的内嵌或执行，就可能导致安全问题（例如XSS）。
->检测工具: XSStrike、Burp Suite、AWVS
+>***检测工具: XSStrike、Burp Suite、AWVS***
+
 ---
 
 ## CSRF

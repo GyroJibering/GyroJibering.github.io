@@ -205,6 +205,11 @@ JS fetch("https://bank.com/api")
 
 ```
 >***浏览器指纹是JS采集的，例如无头爬虫的主要检测方法就是```navigator.webdriver === true```，当然还包括其他很多信息，指纹识别是前端JS代码自动识别的结果，可以伪装。***
+
+Renderer RCE + Kernel LPE可以造成沙箱逃逸，从而利用浏览器拿下主机设备控制权。
+
+具体案例：CVE-2021-1732，win32k 在处理窗口对象时存在 Use-After-Free，用户态可控指针被内核错误使用。这一块就涉及很多pwn相关的内容了，比如UAF的利用过程。看来，pwn才是做安全的必经之路啊。
+
 ## XSS
 ### 危害
 

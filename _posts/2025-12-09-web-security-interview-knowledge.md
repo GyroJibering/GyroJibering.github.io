@@ -10,7 +10,7 @@ author: GyroJ
 
 > 面向 **后端 / 安全 / 开发岗面试**
 > SQL 注入、PDO、CORS、XSS、CSRF、SSRF、XXE、本地/横向提权。
-> 计划长期更新,这算是一本《永乐大典》吗？
+> 计划长期更新,这算是一本《永乐大典》吗？尽量人写，AI率控制在最低
 
 ---
 
@@ -128,6 +128,61 @@ request.getParameter()
 - 是否存在字符串拼接、是否有不可参数化的 SQL 结构，以及 ORM 被误用的场景，
 尤其是 ORDER BY、动态条件和原生 SQL，这些地方在真实项目中最容易出问题
 
+
+## 浏览器背景知识补充概览
+```
+操作系统（Kernel / Hardware）
+└── 浏览器主进程（Browser Process）【高权限】
+    ├── 网络进程（Network Process）【受控高权限】
+    ├── GPU 进程（GPU Process）【受控权限】
+    ├── 渲染进程（Renderer Process）【低权限 / Sandbox】
+    │   ├── V8（JavaScript Engine）
+    │   ├── Blink（DOM / HTML / CSS）
+    │   ├── DOM Tree
+    │   ├── CSSOM
+    │   └── Layout / Paint
+    └── 工具 / 插件进程（Utility / Plugin）
+```
+
+```
+Renderer Process（Sandboxed）
+├── JavaScript 执行层
+│   ├── V8 Runtime
+│   │   ├── Interpreter（Ignition）
+│   │   ├── JIT Compiler（TurboFan）
+│   │   └── Garbage Collector
+│   └── Web APIs（受限接口）
+│       ├── fetch / XHR
+│       ├── setTimeout / Promise
+│       └── DOM API
+│
+├── 文档结构层
+│   ├── HTML Parser
+│   ├── DOM Tree
+│   └── Shadow DOM
+│
+├── 样式与布局层
+│   ├── CSS Parser
+│   ├── CSSOM
+│   ├── Layout Tree
+│   └── Paint Records
+│
+└── IPC 通道（只能“请求”，不能“执行”）
+    ├── → Network Process
+    ├── → Browser Process
+    └── → GPU Process
+```
+```
+JavaScript (fetch / form / img)
+└── Renderer Process
+    └── IPC 请求
+        └── Network Process
+            ├── Cookie 匹配 + 附加
+            ├── SameSite 判断
+            ├── CORS / Preflight
+            └── 发出真实 HTTP 请求
+                └── Internet
+```
 ## XSS
 ### 危害
 
@@ -369,3 +424,31 @@ Connection: close,X-User
 此时不管中间件传回怎样的X-User值，在客户机与中间件的Connection被Connection Header给close掉之后，也根据RFC HTTP1/1的规范（为了向下兼容）将X-User置空。因此我们得到了空的X-User。
 
 在uid = request.headers.get('X-User', '0')中，我们得到了uid为0的用户的登录权限。
+
+### HTTP Host头写法，常用于绕过ssrf的一些过滤
+
+1.合法格式
+```http
+Host: example.com                    # 仅域名
+Host: example.com:8080              # 域名+端口
+Host: 192.168.1.100                 # IPv4
+Host: 192.168.1.100:3000            # IPv4+端口
+Host: [2001:db8::1]                 # IPv6（方括号）
+Host: [2001:db8::1]:8080            # IPv6+端口
+Host: localhost                      # localhost
+Host: localhost:3000                 # localhost+端口
+```
+2.非法格式
+```http
+Host: http://example.com            # ❌ 不能包含协议
+Host: example.com/path              # ❌ 不能包含路径
+Host: user@example.com              # ❌ 不能包含用户信息
+```
+3.安全利用 
+```bash
+# 绕过检测
+Host: 127.0.0.1        # 标准格式
+Host: 127.1            # 省略格式
+Host: 2130706433       # 十进制格式
+Host: 0x7f000001       # 十六进制格式
+```

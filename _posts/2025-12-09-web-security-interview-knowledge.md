@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 用八十岁老奶也能听懂的话总结了面试常用的Web安全漏洞
-date: 2025-12-20
+date: 2025-12-21
 categories: [安全, 面试]
 tags: [Web安全, 面试, SQL注入, XSS, CSRF, SSRF, XXE, 安全漏洞]
 toc: true
@@ -471,7 +471,7 @@ Connection: close,X-User
 ### HTTP Host头写法，常用于绕过ssrf的一些过滤
 
 1.合法格式
-```http
+```
 Host: example.com                    # 仅域名
 Host: example.com:8080              # 域名+端口
 Host: 192.168.1.100                 # IPv4
@@ -482,13 +482,13 @@ Host: localhost                      # localhost
 Host: localhost:3000                 # localhost+端口
 ```
 2.非法格式
-```http
+```
 Host: http://example.com            # ❌ 不能包含协议
 Host: example.com/path              # ❌ 不能包含路径
 Host: user@example.com              # ❌ 不能包含用户信息
 ```
 3.安全利用 
-```bash
+```
 # 绕过检测
 Host: 127.0.0.1        # 标准格式
 Host: 127.1            # 省略格式

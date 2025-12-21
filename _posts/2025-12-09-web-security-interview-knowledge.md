@@ -183,6 +183,28 @@ JavaScript (fetch / form / img)
             └── 发出真实 HTTP 请求
                 └── Internet
 ```
+一次完整的HTTPS请求过程
+```
+JS fetch("https://bank.com/api")
+│
+└── Renderer Process
+    └── IPC：我要请求这个 URL
+        │
+        └── Network Process
+            ├── DNS
+            ├── TCP connect
+            ├── TLS Handshake
+            │   ├── ClientHello
+            │   ├── ServerHello
+            │   ├── Certificate
+            │   └── Key Exchange
+            ├── HTTP 请求（明文）
+            ├── TLS 加密
+            └── TCP 发包
+                └── Internet
+
+```
+>***浏览器指纹是JS采集的，例如无头爬虫的主要检测方法就是```navigator.webdriver === true```，当然还包括其他很多信息，指纹识别是前端JS代码自动识别的结果，可以伪装。***
 ## XSS
 ### 危害
 

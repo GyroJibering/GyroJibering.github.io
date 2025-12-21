@@ -207,7 +207,6 @@ JS fetch("https://bank.com/api")
             ├── TLS 加密
             └── TCP 发包
                 └── Internet
-
 ```
 >***浏览器指纹是JS采集的，例如无头爬虫的主要检测方法就是```navigator.webdriver === true```，当然还包括其他很多信息，指纹识别是前端JS代码自动识别的结果，可以伪装。***
 

@@ -495,3 +495,57 @@ Host: 127.1            # 省略格式
 Host: 2130706433       # 十进制格式
 Host: 0x7f000001       # 十六进制格式
 ```
+
+## SSRF
+同样的，给出总结的能力树，具体细节，需要具体研究。事实上，ssrf漏洞并非必须要使用gopher协议才能写入redis执行命令，在某些配置有问题的场景下，ssrf可以完全控制http，依然可以直接构造tcp流传给redis，达成执行命令的效果。(Protocol Smuggling via SSRF)因为这一点导致我在某场面试中失利。面试官想要考察的是SSRF利用Gopher来打服务器内部的redis这一类服务，达成执行命令的效果，结果我这个案例直接没有经过gopher，运气不好是这样的。
+
+```
+SSRF
+├── ① 基础 SSRF（Outbound HTTP）
+│   ├── 能访问外部 URL
+│   └── 只能访问开发者预期的资源
+│
+├── ② 内网可达 SSRF（Network Pivot）
+│   ├── 可访问 127.0.0.1 / 内网 IP
+│   ├── 可探测端口 / 服务存活
+│   └── 风险：信息泄露 / 管理接口暴露
+│
+├── ③ 可回显 SSRF（Full HTTP SSRF）
+│   ├── 能读取响应内容
+│   ├── 可访问内部 Web / API
+│   └── 风险：配置泄露 / 未授权访问
+│
+├── ④ Blind SSRF（Side-channel SSRF）
+│   ├── 无直接回显
+│   ├── 通过 DNS / 延迟 / 日志判断
+│   └── 风险：内网探测 / 云环境利用
+│
+├── ⑤ 协议扩展 SSRF（Protocol Abuse）
+│   ├── file://
+│   │   └── 本地文件读取（视实现而定）
+│   │
+│   ├── ftp:// / dict://
+│   │   └── 较少见，影响有限
+│   │
+│   └── ★ gopher://  ←【质变点】
+│       ├── 任意 TCP 连接
+│       ├── 任意字节写入
+│       └── SSRF → 内网协议攻击
+│
+├── ⑥ 内网服务控制（Service Takeover）
+│   ├── Redis / Memcached
+│   ├── 内部 Admin / Debug 接口
+│   ├── Docker / Kubelet API
+│   └── 风险：横向移动 / 主机控制
+│
+├── ⑦ 云元数据 SSRF（Cloud Pivot）
+│   ├── 169.254.169.254
+│   ├── 获取 IAM / RAM / Token
+│   └── 风险：云资源接管
+│
+└── ⑧ 基础设施级失陷（Infra Compromise）
+    ├── 云主机接管
+    ├── 容器逃逸
+    └── 整个环境失控
+
+```

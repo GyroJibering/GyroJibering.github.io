@@ -304,7 +304,10 @@ CSRF 的产生源于浏览器对 Cookie 的自动携带机制，同源策略仅�
 ### 面试遇到的问题：为什么后端api使用json不能完全防住csrf
 原理上出发：传统csrf是使用浏览器直接发送表单，不能发送json数据，如果要发送json数据，就必须要调取JS，但是调取JS的过程中受到CORS的阻碍
 
-CSRF 并不是不能发送 JSON，而是在没有 XSS 的前提下，浏览器不允许跨站页面构造并发送携带 application/json 的请求；因此“JSON API 看起来不容易被 CSRF”是浏览器安全模型的副作用，而不是 JSON 自身的安全性。
+CSRF 并不是不能发送 JSON，而是在没有 XSS 的前提下，浏览器不允许跨站页面构造并发送携带 application/json 的请求；因为会触发CORS预检(OPTIONS)因此“JSON API 看起来不容易被 CSRF”是浏览器安全模型的副作用，而不是 JSON 自身的安全性。
+>***CORS预检：在发送跨站请求的时候会被触发，浏览器自动向服务器发送OPTIONS请求，询问浏览器：“接下来我要给你发一个这样的跨站请求，你能接受吗？”就算CORS配置不正确导致允许了这个cross-site请求的发送，后续的Same-Site安全策略依然会不携带cookie，双重保障***
+
+
 `<form>` 的硬限制
 
 HTML 表单 只能 发：

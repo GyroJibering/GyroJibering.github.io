@@ -1,9 +1,9 @@
 ---
 layout: post
 title: 用八十岁老奶也能听懂的话总结了面试常用的Web安全漏洞
-date: 2025-12-21
+date: 2025-12-23
 categories: [安全, 面试]
-tags: [Web安全, 面试, SQL注入, XSS, CSRF, SSRF, XXE, 安全漏洞]
+tags: [Web安全, 面试, SQL注入, XSS, CSRF, SSRF, LLM攻防]
 toc: true
 author: GyroJ
 ---

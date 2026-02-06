@@ -673,6 +673,196 @@ SSRF
     └── 整个环境失控
 ```
 
+## XXE
+这是一个好东西，XXE，外部实体注入，也就是XML注入，这个漏洞的本质来源是XML引用了DTD，同时进行了外部实体展开...
+
+
+直接看这篇文章吧，懒得抄了
+
+[xxe详解](https://www.freebuf.com/vuls/319806.html)
+
+这篇文章里面还有扩展文章，都可以看一下，受益匪浅。
+
+注意xxe的报错注入，也就是同时实体请求正确的路径和错误的路径，导致报错，这个时候文件就会在报错信息中被读取出来，这里的错误路径可以是文件路径，也可以是http访问一个错误的网站之类的：
+
+```js
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % killshot "<!ENTITY % error SYSTEM 'file:///nonexistent/%file;'>">
+%killshot;
+%error;
+```
+可供参考的漏洞：[CVE-2025-66516](https://forum.butian.net/share/4676)
+
+这是apache tika的漏洞，具体细节可以多研究研究
+
+**XXE = XML 解析器在“预处理阶段”执行了攻击者定义的外部实体**
+
+### XXE 成立的三个【必要且充分】条件
+
+1. 用户可控 XML（信任边界）
+
+XML 内容 **来自外部输入**
+
+你看到这些，就要警觉：
+
+```php
+file_get_contents('php://input');
+```
+
+```java
+@RequestBody String xml
+```
+
+```python
+request.data
+```
+
+```go
+io.ReadAll(req.Body)
+```
+#### 示例
+
+```php
+// ✅ 满足条件 ①
+$xml = file_get_contents('php://input');
+```
+
+```php
+// ❌ 不满足（安全）
+$xml = '<config><name>test</name></config>';
+```
+2.允许 DTD / ENTITY（生死分水岭）
+
+本质
+
+解析器是否允许 XML **“预处理阶段”** 执行实体展开
+
+**这是 XXE 的根因**
+
+---
+
+#### PHP 中的危险特征
+
+```php
+libxml_disable_entity_loader(false);
+
+$dom->loadXML($xml, LIBXML_DTDLOAD);
+
+$dom->loadXML($xml, LIBXML_NOENT);
+```
+
+👉 **只要看到 `DTDLOAD` 或 `NOENT`，直接拉警报**
+
+---
+
+#### Java 中的危险特征（反向判断）
+
+```java
+DocumentBuilderFactory.newInstance();
+```
+
+如果你 **没看到** 下面这些安全配置，就是危险的：
+
+```java
+disallow-doctype-decl = true
+external-general-entities = false
+external-parameter-entities = false
+```
+
+---
+
+#### 示例
+
+```php
+// ✅ 满足条件 ②
+$dom->loadXML($xml, LIBXML_NOENT | LIBXML_DTDLOAD);
+```
+
+```php
+// ❌ 不满足（从根切断）
+libxml_disable_entity_loader(true);
+$dom->loadXML($xml, LIBXML_NONET);
+```
+
+---
+
+3.ENTITY 结果被“利用”
+
+#### 本质
+
+外部实体展开后的内容：
+
+* 是否影响程序行为？
+
+“利用” **不等于 echo**
+
+包括：
+
+* 输出给用户
+* 写日志
+* 拼 SQL
+* 发 HTTP 请求
+* 抛异常（**报错读取文件**）
+
+---
+
+#### 常见利用点
+
+```php
+echo $creds->username;
+```
+
+```java
+return xml.getTextContent();
+```
+
+```python
+print(tree.xpath("//data/text()"))
+```
+
+```php
+catch(Exception $e){
+    echo $e->getMessage(); // ⚠️ 报错读取
+}
+```
+
+---
+
+#### 判定表
+
+| 情况           | 是否 XXE            |
+| ------------ | ----------------- |
+| 有回显          | ✅ 直接 XXE          |
+| 无回显但有请求 / 报错 | ✅ Blind / OOB XXE |
+
+---
+
+### 完整“存在 XXE”的代码示例
+
+```php
+$xml = file_get_contents('php://input');          // ① 用户可控
+libxml_disable_entity_loader(false);               // ② 允许实体
+$dom = new DOMDocument();
+$dom->loadXML($xml, LIBXML_NOENT | LIBXML_DTDLOAD);// ②
+$creds = simplexml_import_dom($dom);
+echo $creds->username;                             // ③ 使用结果
+```
+
+👉 **Confirmed XXE**
+
+---
+
+### 一个“看起来像，其实安全”的例子
+
+```php
+$xml = file_get_contents('php://input');   // ① 仍然用户可控
+$dom = new DOMDocument();
+$dom->loadXML($xml, LIBXML_NONET);          // ❌ 禁 DTD / 网络
+$creds = simplexml_import_dom($dom);
+echo $creds->username;
+```
+
+
 ## LLM攻防初步了解
 >***你知道的，我特别喜欢知识树这种东西，因为人的大脑内部对数据的存储，其实也是树状图***
 

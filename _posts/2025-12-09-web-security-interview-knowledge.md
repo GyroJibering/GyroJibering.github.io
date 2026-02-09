@@ -861,15 +861,15 @@ $dom->loadXML($xml, LIBXML_NONET);          // ❌ 禁 DTD / 网络
 $creds = simplexml_import_dom($dom);
 echo $creds->username;
 ```
-## Java发序列化
+## Java反序列化
 我的天，这部分看起来需要很久的学习啊
 
 对于java反序列化漏洞的学习，感觉妙哥的文章写的确实不错，乍看之下却是不错，但是对于没有基础的人来说，还是晦涩难懂，他的文章只适合在无聊的时候看，需要掌握一定java基础，最起码前端看起来还不错？就我个人而言，chatGPT还是我最好的老师，所以是结合起来看：
 
 [妙](https://changeyourway.github.io)
 
-首先，还是面试问题：如何黑名单过滤java反序列化？
-### 1.定义一个黑名单ObjectInputStream继承 ObjectInputStream，然后在里面自己写过滤逻辑。
+### 首先，还是面试问题：如何黑名单过滤java反序列化？
+1. 定义一个黑名单ObjectInputStream继承 ObjectInputStream，然后在里面自己写过滤逻辑。
 ```java
 import java.io.*;
 import java.util.Set;
@@ -903,7 +903,7 @@ public class BlacklistObjectInputStream extends ObjectInputStream {
 }
 
 ```
-### 2.重写重写 resolveClass()，下面这种写法有点像白名单
+2. 重写重写 resolveClass()，下面这种写法有点像白名单
 
 ```java
 protected Class<?> resolveClass(ObjectStreamClass desc)
@@ -920,7 +920,7 @@ protected Class<?> resolveClass(ObjectStreamClass desc)
 
 ```
 
-### 3.JEP-290
+3. JEP-290
 这是java9开始引入的一个自带的过滤机制，在我实际写java代码的过程中也用到了，总之，很烦这玩意，不让我调用各种包，必须要在vm option里面设置--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED这样的东西才能让我调用
 
 我们来提出经典的五W问题，How？

@@ -861,8 +861,95 @@ $dom->loadXML($xml, LIBXML_NONET);          // ❌ 禁 DTD / 网络
 $creds = simplexml_import_dom($dom);
 echo $creds->username;
 ```
+## Java发序列化
+我的天，这部分看起来需要很久的学习啊
 
+对于java反序列化漏洞的学习，感觉妙哥的文章写的确实不错，乍看之下却是不错，但是对于没有基础的人来说，还是晦涩难懂，他的文章只适合在无聊的时候看，需要掌握一定java基础，最起码前端看起来还不错？就我个人而言，chatGPT还是我最好的老师，所以是结合起来看：
 
+[妙](https://changeyourway.github.io)
+
+首先，还是面试问题：如何黑名单过滤java反序列化？
+### 1.定义一个黑名单ObjectInputStream继承 ObjectInputStream，然后在里面自己写过滤逻辑。
+```java
+import java.io.*;
+import java.util.Set;
+
+public class BlacklistObjectInputStream extends ObjectInputStream {
+
+    private static final Set<String> BLACKLIST = Set.of(
+        "org.apache.commons.collections.functors.InvokerTransformer",
+        "java.lang.Runtime",
+        "javax.naming.InitialContext"
+    );
+
+    public BlacklistObjectInputStream(InputStream in) throws IOException {
+        super(in);
+    }
+
+    @Override
+    protected Class<?> resolveClass(ObjectStreamClass desc)
+            throws IOException, ClassNotFoundException {
+
+        String className = desc.getName();
+
+        if (BLACKLIST.contains(className)) {
+            throw new InvalidClassException(
+                "Blocked deserialization of " + className
+            );
+        }
+
+        return super.resolveClass(desc);
+    }
+}
+
+```
+### 2.重写重写 resolveClass()，下面这种写法有点像白名单
+
+```java
+protected Class<?> resolveClass(ObjectStreamClass desc)
+        throws IOException, ClassNotFoundException {
+
+    String name = desc.getName();
+
+    if (!name.startsWith("com.mycorp.safe")) {
+        throw new InvalidClassException("Rejected: " + name);
+    }
+
+    return super.resolveClass(desc);
+}
+
+```
+
+### 3.JEP-290
+这是java9开始引入的一个自带的过滤机制，在我实际写java代码的过程中也用到了，总之，很烦这玩意，不让我调用各种包，必须要在vm option里面设置--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED这样的东西才能让我调用
+
+我们来提出经典的五W问题，How？
+
+```
+readObject
+ ├─ 读类描述
+ ├─ 调用 filter.checkInput()
+ │    ├─ 看类
+ │    ├─ 看深度
+ │    ├─ 看引用数
+ │    └─ 看数组
+ ├─ 若 REJECTED → 抛异常
+ ├─ 否则继续
+
+```
+这里的filter就是，可以用来过滤。
+
+怎么用？
+
+```java
+-Djdk.serialFilter=\
+maxdepth=10;\
+maxrefs=1000;\
+maxbytes=1048576;\
+com.mycorp.safe.*;\
+!*
+```
+拦不住的情况：未设置、设置了但是过于宽松、中间价自己反序列化、使用了非原生序列化框架。
 ## LLM攻防初步了解
 >***你知道的，我特别喜欢知识树这种东西，因为人的大脑内部对数据的存储，其实也是树状图***
 

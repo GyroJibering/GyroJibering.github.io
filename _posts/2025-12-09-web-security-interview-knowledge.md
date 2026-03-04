@@ -950,6 +950,15 @@ com.mycorp.safe.*;\
 !*
 ```
 拦不住的情况：未设置、设置了但是过于宽松、中间价自己反序列化、使用了非原生序列化框架。
+## Nosql注入
+### 推荐阅读
+[奇安信攻防社区Nosql注入](https://forum.butian.net/share/474)
+
+### 最新CTF题目
+aliCTF 2026-Easy-Login
+
+用到了mongodb的nosql注入，后端使用findOne()函数查询session，可用将cookie替换为sid=j:{"$ne":"s"}，中间件Express会自动将sid解析为json对象，然后在mongodb中执行，我们也就获得了管理员的session。
+
 ## LLM攻防初步了解
 >***你知道的，我特别喜欢知识树这种东西，因为人的大脑内部对数据的存储，其实也是树状图***
 

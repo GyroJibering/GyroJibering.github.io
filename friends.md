@@ -81,6 +81,24 @@ permalink: /friends/
               </a>
             </div>
           </div>
+
+          <div class="friend-card">
+            <div class="friend-card__avatar">
+              <img src="/img/friends/miao.jpg" alt="miao" class="friend-avatar">
+            </div>
+            <div class="friend-card__content">
+              <h3 class="friend-card__name">
+                <a href="https://changeyourway.github.io/" target="_blank" rel="noopener noreferrer">miao</a>
+              </h3>
+              <p class="friend-card__title">个人博客</p>
+              <p class="friend-card__description">
+                记录一些技术随笔与想法。
+              </p>
+              <a href="https://changeyourway.github.io/" target="_blank" rel="noopener noreferrer" class="friend-card__link">
+                访问主页 →
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

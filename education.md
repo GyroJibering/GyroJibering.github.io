@@ -41,7 +41,6 @@ permalink: /education/
         <div class="profile-item">
           <h3>2. 复旦大学CTF战队******队长、Web、Reverse手</h3>
           <ul>
-            <li>W&MCTF 团队赛 16th place</li>
             <li>FDUCTF2025 总负责人兼Web出题</li>
           </ul>
         </div>

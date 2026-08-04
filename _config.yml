@@ -2,7 +2,6 @@
 title: GyroJ
 description: A cybersecurity newbie
 url: https://gyrojibering.github.io
-avatar: /avatar.jpeg
 paginate: 5
 permalink: pretty
 cover_image: /img/bk.jpg
@@ -56,4 +55,3 @@ sass:
 author:
   name: GyroJ
   url: https://github.com/GyroJibering/
-  email: your-email@example.com

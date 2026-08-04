@@ -1,12 +1,3 @@
-- title: Profile
-  url: /education/
-  children:
-    - title: 教育背景
-      url: /education/
-    - title: 项目经验
-      url: /projects/
-    - title: 联系方式
-      url: /contact/
 - title: Blog
   url: /blog/
 - title: Something Fun

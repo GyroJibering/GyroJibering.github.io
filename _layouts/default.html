@@ -8,7 +8,9 @@
     <header class="site-header" id="siteHeader">
       <div class="site-header__inner">
         <a class="site-brand" href="{{ '/blog/' | relative_url }}" aria-label="返回 GyroJ 首页">
-          <span class="site-brand__mark" aria-hidden="true">G</span>
+          <span class="site-brand__mark">
+            <img src="{{ site.avatar | relative_url }}" alt="" width="400" height="400">
+          </span>
           <span class="site-brand__copy">
             <strong>GyroJ</strong>
             <small>SECURITY NOTES</small>

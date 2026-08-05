@@ -18,6 +18,13 @@ permalink: /blog/
       <p class="blog-hero-summary">记录 Web 安全、逆向工程、CTF 与真实世界中的技术探索。少一些结论，多一些推导过程。</p>
     </div>
     <div class="blog-hero-aside">
+      <figure class="profile-portrait">
+        <img src="{{ site.avatar | relative_url }}" alt="GyroJ 的头像" width="400" height="400" fetchpriority="high">
+        <figcaption>
+          <strong>GyroJ</strong>
+          <span>WEB SECURITY / REVERSE</span>
+        </figcaption>
+      </figure>
       <dl class="blog-hero-facts" aria-label="博客信息">
         <div>
           <dt>{{ site.posts | size }}</dt>

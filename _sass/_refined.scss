@@ -354,12 +354,15 @@ h6 {
 }
 
 .profile-portrait {
+  width: min(100%, 240px);
   margin: 0 0 28px;
 }
 
 .profile-portrait img {
+  display: block;
   width: 100%;
-  aspect-ratio: 1;
+  height: auto;
+  aspect-ratio: 1 / 1;
   margin: 0;
   border: 1px solid rgba(17, 18, 16, 0.12);
   border-radius: 18px;
@@ -1179,7 +1182,7 @@ html body .game-info {
   }
 
   .profile-portrait {
-    width: min(62vw, 240px);
+    width: min(58vw, 220px);
   }
 
   .blog-hero-facts {

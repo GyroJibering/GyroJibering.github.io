@@ -57,7 +57,6 @@ permalink: /blog/
       <p class="blog-explorer__empty">暂时还没有文章，稍后再来看看吧。</p>
     {% else %}
       {% for post in blog_posts %}
-        {% assign content_id = 'post-' | append: forloop.index0 %}
         <article class="blog-card" data-post>
           <header class="blog-card__header">
             <div>
@@ -82,13 +81,6 @@ permalink: /blog/
             <a class="blog-card__link" href="{{ post.url | relative_url }}">
               阅读原文
             </a>
-            <button class="blog-card__toggle" type="button" aria-expanded="false" aria-controls="{{ content_id }}" data-target="{{ content_id }}">
-              展开全文
-            </button>
-          </div>
-
-          <div class="blog-card__full" id="{{ content_id }}" hidden>
-            {{ post.content }}
           </div>
         </article>
         {% endfor %}
@@ -101,22 +93,6 @@ permalink: /blog/
   window.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('blog-search-input');
     const cards = Array.from(document.querySelectorAll('[data-post]'));
-
-    function toggleCard(button) {
-      const target = document.getElementById(button.dataset.target);
-      if (!target) { return; }
-      const expanded = button.getAttribute('aria-expanded') === 'true';
-      button.setAttribute('aria-expanded', String(!expanded));
-      button.textContent = expanded ? '展开全文' : '收起全文';
-      target.hidden = expanded;
-    }
-
-    cards.forEach((card) => {
-      const button = card.querySelector('.blog-card__toggle');
-      if (button) {
-        button.addEventListener('click', () => toggleCard(button));
-      }
-    });
 
     if (searchInput) {
       const normalize = (text) => text.toLowerCase().replace(/\s+/g, ' ').trim();

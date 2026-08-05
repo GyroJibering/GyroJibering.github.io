@@ -568,9 +568,7 @@ h6 {
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
-  display: grid;
-  justify-items: stretch;
-  gap: 9px;
+  display: block;
 }
 
 .blog-card__link,
@@ -591,6 +589,7 @@ h6 {
 }
 
 .blog-card__link {
+  width: 100%;
   color: #fff;
   background: var(--ink);
 }
@@ -1179,8 +1178,7 @@ html body .game-info {
 
   .blog-card__actions {
     margin-top: 22px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: block;
   }
 
   .blog-card__full {

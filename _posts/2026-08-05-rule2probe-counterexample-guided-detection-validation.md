@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Rule2Probe：基于反例引导神经符号合成的可执行检测验证"
-date: 2026-08-05 18:00 +0800
+date: 2026-08-05 17:00 +0800
 categories: [AI安全]
 tags: [大模型, 检测工程, Sigma, Esper, CEGIS, QLoRA, 攻防研究]
 mathjax: true

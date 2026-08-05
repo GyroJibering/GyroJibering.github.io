@@ -12,17 +12,38 @@ permalink: /blog/
 
 <section class="blog-explorer">
   <header class="blog-explorer__hero">
-    <div class="blog-hero-header">
-      <p>欢迎大家加入我的 Discord 交流博客！ -------------</p>
+    <div class="blog-hero-copy">
+      <p class="eyebrow">GYROJ · SECURITY NOTES</p>
+      <h1>把复杂的问题，<br>拆成可验证的答案。</h1>
+      <p class="blog-hero-summary">记录 Web 安全、逆向工程、CTF 与真实世界中的技术探索。少一些结论，多一些推导过程。</p>
+    </div>
+    <div class="blog-hero-aside">
+      <dl class="blog-hero-facts" aria-label="博客信息">
+        <div>
+          <dt>{{ site.posts | size }}</dt>
+          <dd>篇技术记录</dd>
+        </div>
+        <div>
+          <dt>Web / RE</dt>
+          <dd>持续关注方向</dd>
+        </div>
+      </dl>
       <a href="https://discord.gg/CWg9Tu6mDt" target="_blank" rel="noopener noreferrer" class="discord-link">
-        <i class="fab fa-discord"></i>
+        加入 Discord <span aria-hidden="true">↗</span>
       </a>
+    </div>
+  </header>
+
+  <div class="blog-toolbar">
+    <div>
+      <p class="eyebrow">LATEST WRITING</p>
+      <h2>文章与研究笔记</h2>
     </div>
     <label class="blog-search">
       <span class="blog-search__label">搜索文章</span>
-      <input id="blog-search-input" type="search" placeholder="按标题、关键字过滤…" autocomplete="off">
+      <input id="blog-search-input" type="search" placeholder="标题、方向或关键字" autocomplete="off">
     </label>
-  </header>
+  </div>
 
   <div class="blog-explorer__panel">
     <div class="blog-explorer__list">
@@ -40,7 +61,7 @@ permalink: /blog/
         <article class="blog-card" data-post>
           <header class="blog-card__header">
             <div>
-              <p class="blog-card__date">{{ post.date | date: "%Y-%m-%d" }}</p>
+              <p class="blog-card__date"><span>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>{{ post.date | date: "%Y.%m.%d" }}</p>
               <h2 class="blog-card__title">{{ post.title }}</h2>
             </div>
             <div class="blog-card__meta">

@@ -4,36 +4,56 @@
   {% include head.html %}
 
   <body>
-    <div class="page-wrapper">
-      <div class="container pure-g">
-        {%- assign cover_bg_color = site.cover_bg_color | default: "rgb(40, 73, 77)" -%}
-        {%- assign cover_color    = site.cover_color    | default: "rgb(255, 255, 255)" -%}
-        {%- assign cover_image    = site.cover_image -%}
-        {%- if page.cover_bg_color -%}
-          {%- assign cover_bg_color  = page.cover_bg_color -%}
-        {%- endif -%}
-        {%- if page.cover_color -%}
-          {%- assign cover_color     = page.cover_color -%}
-        {%- endif -%}
-        {%- if page.cover_image -%}
-          {%- assign cover_image     = page.cover_image -%}
-        {%- endif -%}
-        <div class="sidebar-left pure-u-1 pure-u-md-1-4">
-          {%- include sidebar-left.html -%}
-        </div>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header" id="siteHeader">
+      <div class="site-header__inner">
+        <a class="site-brand" href="{{ '/blog/' | relative_url }}" aria-label="返回 GyroJ 首页">
+          <span class="site-brand__mark" aria-hidden="true">G</span>
+          <span class="site-brand__copy">
+            <strong>GyroJ</strong>
+            <small>SECURITY NOTES</small>
+          </span>
+        </a>
 
-        <div class="content pure-u-1 pure-u-md-1-2">
+        <nav class="site-nav" id="siteNav" aria-label="主要导航">
+          <a href="{{ '/blog/' | relative_url }}" {% if page.url == '/blog/' %}aria-current="page"{% endif %}>文章</a>
+          <a href="{{ '/categories/' | relative_url }}" {% if page.url == '/categories/' %}aria-current="page"{% endif %}>分类</a>
+          <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' or page.url == '/minesweeper/' or page.url == '/number-maze/' or page.url == '/dinosaur/' %}aria-current="page"{% endif %}>实验场</a>
+          <a href="{{ '/friends/' | relative_url }}" {% if page.url == '/friends/' %}aria-current="page"{% endif %}>朋友</a>
+          <a class="site-nav__github" href="https://github.com/GyroJibering" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+
+        <button class="site-nav-toggle" id="siteNavToggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="siteNav">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-wrapper">
+      <div class="site-shell">
+        <div class="content" id="main-content">
           {%- include content.html -%}
-        </div>
-        <div class="sidebar-right pure-u-1 pure-u-md-1-4">
-          {%- include sidebar-right.html -%}
         </div>
       </div>
     </div>
 
-    <script async src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <div>
+          <strong>GyroJ</strong>
+          <p>Web Security · Reverse Engineering · CTF</p>
+        </div>
+        <div class="site-footer__links">
+          <a href="{{ '/blog/' | relative_url }}">文章</a>
+          <a href="{{ '/friends/' | relative_url }}">朋友</a>
+          <a href="https://github.com/GyroJibering" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+        <small>© {{ 'now' | date: "%Y" }} GyroJ</small>
+      </div>
+    </footer>
 
-    {%- include scroll.html -%}
+    <script src="{{ '/assets/site.js' | relative_url }}" defer></script>
 
     {%- if page.math -%}
       {% include mathjax.html %}

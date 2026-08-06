@@ -41,6 +41,17 @@ permalink: /blog/
     </div>
   </header>
 
+  <aside class="team-callout" aria-labelledby="sixstars-title">
+    <p class="eyebrow">FUDAN CTF TEAM</p>
+    <div class="team-callout__copy">
+      <h2 id="sixstars-title">我所在的六星战队。</h2>
+      <p>六星战队（******）由复旦大学计算与智能创新学院学生组成，长期专注于 Web、Pwn、Reverse、Crypto 等安全方向，活跃于国内外高水平 CTF 赛事，并主办 *CTF 国际赛。我目前担任战队队长。</p>
+    </div>
+    <a class="team-callout__link" href="https://gyrojibering.github.io/sixstars-official-web-pages/" target="_blank" rel="noopener noreferrer">
+      访问战队官网 <span aria-hidden="true">↗</span>
+    </a>
+  </aside>
+
   <div class="blog-toolbar">
     <div>
       <p class="eyebrow">LATEST WRITING</p>

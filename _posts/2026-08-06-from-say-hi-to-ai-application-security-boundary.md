@@ -200,6 +200,25 @@ Application Shape Recon 不只输出能力表，也会根据观测结果路由�
 
 这套框架已经在两个本地模型上用同一代码复用。更重要的是，它让“换模型以后应该重测什么”变成了报告的一部分，而不是研究者凭感觉决定。
 
+## 更新：第三个目标已经走到真实执行面
+
+前两个 Ollama 目标都没有主机副作用，所以命令、文件和沙箱只能保持未知。随后我把
+同一套证据规则用在了本机 Codex CLI 上。
+
+这次观察到了真实 `command_execution`，并用文件哈希与回环 callback 验证了三档
+沙箱：
+
+- `workspace-write` 可以读取项目外 canary，但普通项目外写入被拒绝；
+- 工作区和 `/tmp` 可以写入；
+- 工具进程的回环网络被阻断；
+- `read-only` 仍可执行读命令，但文件修改被拒绝；
+- `danger-full-access` 可以真实完成项目外写入和回环网络访问。
+
+这不是“发现 Codex 漏洞”的标题实验，而是终于把 Application Shape 从模型与工具
+协议推进到了真实 Agent 的文件、命令和网络隔离层。
+
+完整过程见：[我让 Codex 自己测自己的沙箱：它能读到项目外，但写不出去](https://gyrojibering.github.io/blog/codex-cli-agent-sandbox-boundary/)。
+
 ## 仍然没有解决的部分
 
 当前公开结果没有覆盖：
@@ -219,6 +238,7 @@ Application Shape Recon 不只输出能力表，也会根据观测结果路由�
 - [综合研究结论](https://github.com/GyroJibering/ai-guard-lab/blob/main/docs/AI_APPLICATION_BOUNDARY_RESEARCH_ZH.md)
 - [7B Application Shape 报告](https://github.com/GyroJibering/ai-guard-lab/blob/main/reports/qwen2.5-coder-7b-app-shape-v1-2026-08-06/application-shape.md)
 - [14B Application Shape 报告](https://github.com/GyroJibering/ai-guard-lab/blob/main/reports/qwen3-14b-app-shape-v1-2026-08-06/application-shape.md)
+- [Codex CLI 能力与隔离边界报告](https://github.com/GyroJibering/ai-guard-lab/blob/main/reports/codex-cli-0.147.0-boundary-v1-2026-08-06/boundary-report.md)
 - [46 项 Coverage Ledger](https://github.com/GyroJibering/ai-guard-lab/blob/main/reports/qwen2.5-coder-7b-coverage-ledger-v1-2026-08-05/coverage-ledger.md)
 - [上一篇：300 次安全体检](https://gyrojibering.github.io/blog/ai-guard-lab-llm-security-boundary-atlas/)
 

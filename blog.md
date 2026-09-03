@@ -65,12 +65,18 @@ permalink: /blog/
 
   <div class="blog-explorer__panel">
     <div class="blog-explorer__list">
-    {% assign blog_posts = "" | split: "" %}
+    {% assign pinned_posts = "" | split: "" %}
+    {% assign regular_posts = "" | split: "" %}
     {% for post in site.posts %}
       {% unless post.categories contains "项目" %}
-        {% assign blog_posts = blog_posts | push: post %}
+        {% if post.pinned %}
+          {% assign pinned_posts = pinned_posts | push: post %}
+        {% else %}
+          {% assign regular_posts = regular_posts | push: post %}
+        {% endif %}
       {% endunless %}
     {% endfor %}
+    {% assign blog_posts = pinned_posts | concat: regular_posts %}
     {% if blog_posts == empty %}
       <p class="blog-explorer__empty">暂时还没有文章，稍后再来看看吧。</p>
     {% else %}

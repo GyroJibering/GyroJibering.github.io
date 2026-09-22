@@ -6,7 +6,6 @@ categories: [随笔]
 tags: [面试, 职场, 选择, 成长]
 permalink: /blog/what-my-interviewer-wanted-to-hear/
 toc: true
-pinned: true
 ---
 
 这一年，我见过一些伯乐。

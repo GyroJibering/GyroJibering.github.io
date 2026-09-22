@@ -44,7 +44,8 @@ int main() {
         gap_count.fetch_add(1, std::memory_order_relaxed);
         continue;  // production code would stop publication and request recovery
       }
-      if (result == ll::BookResult::applied && update.side == ll::Side::ask) {
+      if (result == ll::BookResult::applied && update.side == ll::Side::ask &&
+          book.top().valid) {
         auto top = book.top();
         while (!book_to_strategy.try_push(top)) std::this_thread::yield();
       }
@@ -63,7 +64,7 @@ int main() {
       }
       if (top.market_sequence <= previous_market_seq) std::abort();
       previous_market_seq = top.market_sequence;
-      if (top.ask_price > top.bid_price) {
+      if (top.valid) {
         ll::OrderIntent intent{++decision_seq, top.market_sequence,
                                top.bid_price, 1, ll::Side::bid};
         while (!strategy_to_orders.try_push(intent)) std::this_thread::yield();

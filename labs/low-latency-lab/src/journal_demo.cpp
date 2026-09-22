@@ -1,211 +1,145 @@
 #if !defined(__linux__)
 #error "journal_demo requires Linux"
 #endif
-
-#include "ll/latency.hpp"
-
-#include <algorithm>
-#include <array>
+#include "ll/journal_format.hpp"
 #include <atomic>
 #include <cerrno>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
+#include <filesystem>
 #include <fcntl.h>
 #include <iostream>
-#include <memory>
+#include <limits>
 #include <poll.h>
-#include <stdexcept>
-#include <string>
-#include <string_view>
 #include <sys/eventfd.h>
 #include <sys/mman.h>
+#include <system_error>
 #include <thread>
 #include <unistd.h>
 
 namespace {
-
-constexpr std::uint64_t journal_magic = 0x4759524f4a4e4c31ULL;  // GYROJNL1
-
-struct alignas(4096) JournalHeader {
-  std::uint64_t magic{};
-  std::uint64_t version{};
-  std::uint64_t capacity{};
-  std::uint64_t record_size{};
-  std::array<std::byte, 4096 - 32> padding{};
-};
-static_assert(sizeof(JournalHeader) == 4096);
-
-struct alignas(64) JournalRecord {
-  std::uint64_t committed_sequence{};
-  std::uint64_t tsc{};
-  std::uint64_t stream_sequence{};
-  std::uint32_t type{};
-  std::uint32_t length{};
-  std::uint64_t checksum{};
-  std::array<char, 24> payload{};
-};
-static_assert(sizeof(JournalRecord) == 64);
-static_assert(std::atomic_ref<std::uint64_t>::is_always_lock_free,
-              "journal commit marker must be lock-free on this target");
-
-std::uint64_t checksum(const JournalRecord& record) noexcept {
-  std::uint64_t hash = 1469598103934665603ULL;
-  const auto mix = [&](const void* data, std::size_t size) {
-    const auto* bytes = static_cast<const unsigned char*>(data);
-    for (std::size_t i = 0; i < size; ++i) {
-      hash ^= bytes[i];
-      hash *= 1099511628211ULL;
-    }
-  };
-  mix(&record.tsc, sizeof(record.tsc));
-  mix(&record.stream_sequence, sizeof(record.stream_sequence));
-  mix(&record.type, sizeof(record.type));
-  mix(&record.length, sizeof(record.length));
-  mix(record.payload.data(), record.payload.size());
-  return hash;
-}
-
-class MmapJournal {
+class Journal {
  public:
-  MmapJournal(const char* path, std::size_t capacity,
-              std::size_t flush_batch = 4096)
-      : capacity_(capacity), flush_batch_(flush_batch) {
-    mapped_bytes_ = sizeof(JournalHeader) + capacity * sizeof(JournalRecord);
-    fd_ = ::open(path, O_RDWR | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
-    if (fd_ == -1 || ::ftruncate(fd_, static_cast<off_t>(mapped_bytes_)) == -1) {
-      throw std::runtime_error("open/ftruncate failed: " +
-                               std::string(std::strerror(errno)));
-    }
-    mapping_ = ::mmap(nullptr, mapped_bytes_, PROT_READ | PROT_WRITE,
-                      MAP_SHARED, fd_, 0);
-    if (mapping_ == MAP_FAILED) {
-      throw std::runtime_error("mmap failed: " +
-                               std::string(std::strerror(errno)));
-    }
-    header_ = static_cast<JournalHeader*>(mapping_);
-    records_ = reinterpret_cast<JournalRecord*>(header_ + 1);
-    std::construct_at(header_,
-                      JournalHeader{journal_magic, 1, capacity_,
-                                    sizeof(JournalRecord)});
-    // mmap returns raw storage. Explicitly start every record lifetime; this
-    // also pre-faults the mapping before the latency-sensitive append loop.
-    for (std::size_t i = 0; i < capacity_; ++i) {
-      std::construct_at(records_ + i);
-    }
-    notify_fd_ = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
-    if (notify_fd_ == -1) throw std::runtime_error("eventfd failed");
-    flusher_ = std::thread([this] { flush_loop(); });
+  Journal(const char* path,std::size_t capacity):capacity_(capacity) {
+    if(capacity==0 || capacity>(std::numeric_limits<std::size_t>::max()-64)/64)
+      throw std::invalid_argument("capacity");
+    bytes_=64+64*capacity;
+    try {
+      fd_=::open(path,O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC,0600);
+      if(fd_<0) fail("create exclusively");
+      // Allocate backing blocks at setup; ENOSPC is reported before append.
+      const int allocation=::posix_fallocate(fd_,0,static_cast<off_t>(bytes_));
+      if(allocation) throw std::system_error(allocation,std::generic_category(),"fallocate");
+      mapping_=::mmap(nullptr,bytes_,PROT_READ|PROT_WRITE,MAP_SHARED,fd_,0);
+      if(mapping_==MAP_FAILED) fail("mmap");
+      std::memset(mapping_,0,bytes_); // setup cost, not part of append timing
+      const auto header=ll::journal::header(capacity);
+      std::memcpy(mapping_,header.data(),64);
+      if(::msync(mapping_,64,MS_SYNC)<0 || ::fsync(fd_)<0) fail("header sync");
+      auto parent=std::filesystem::path(path).parent_path();
+      if(parent.empty()) parent=".";
+      const int directory=::open(parent.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC);
+      if(directory<0) fail("open directory");
+      const int synced=::fsync(directory), saved=errno;
+      ::close(directory);
+      if(synced<0) throw std::system_error(saved,std::generic_category(),"directory sync");
+      event_=::eventfd(0,EFD_CLOEXEC|EFD_NONBLOCK);
+      if(event_<0) fail("eventfd");
+      worker_=std::thread([this]{ flush_loop(); });
+    } catch(...) { cleanup(); throw; }
   }
+  Journal(const Journal&)=delete;
+  Journal& operator=(const Journal&)=delete;
+  ~Journal() { stop(); cleanup(); }
 
-  MmapJournal(const MmapJournal&) = delete;
-  MmapJournal& operator=(const MmapJournal&) = delete;
-
-  ~MmapJournal() {
-    stop_.store(true, std::memory_order_release);
-    signal_flusher();
-    if (flusher_.joinable()) flusher_.join();
-    if (mapping_ != MAP_FAILED) {
-      ::msync(mapping_, mapped_bytes_, MS_SYNC);
-      ::munmap(mapping_, mapped_bytes_);
-    }
-    if (notify_fd_ != -1) ::close(notify_fd_);
-    if (fd_ != -1) ::close(fd_);
+  // Exactly one writer. Returns a *published* sequence, never a durable ACK.
+  std::uint64_t append(std::uint32_t type,std::string_view payload) {
+    if(closed_ || next_==capacity_) throw std::runtime_error("closed/full journal");
+    check_error();
+    const auto b=ll::journal::record(next_+1,type,payload);
+    // The mapped bytes are immutable after publication. No in-place rewriting,
+    // no atomic_ref on persistent C++ objects, no concurrent recovery scanner.
+    std::memcpy(static_cast<std::byte*>(mapping_)+64+next_*64,b.data(),64);
+    published_.store(++next_,std::memory_order_release);
+    if(next_%4096==0) notify();
+    return next_;
   }
-
-  // Single-writer hot path. A multi-producer caller should feed one journal
-  // writer through per-producer SPSC queues so records have one total order.
-  bool append(std::uint64_t stream_sequence, std::uint32_t type,
-              std::string_view payload) {
-    if (next_ >= capacity_ || payload.size() > JournalRecord{}.payload.size()) {
-      return false;
-    }
-    auto& record = records_[next_];
-    record.tsc = ll::tsc_start();
-    record.stream_sequence = stream_sequence;
-    record.type = type;
-    record.length = static_cast<std::uint32_t>(payload.size());
-    record.payload.fill('\0');
-    std::memcpy(record.payload.data(), payload.data(), payload.size());
-    record.checksum = checksum(record);
-
-    const auto commit = next_ + 1;
-    std::atomic_ref(record.committed_sequence)
-        .store(commit, std::memory_order_release);
-    ++next_;
-    committed_.store(commit, std::memory_order_release);
-    if (commit % flush_batch_ == 0) signal_flusher();
-    return true;
+  std::uint64_t close() {
+    stop(); check_error();
+    return durable_.load(std::memory_order_acquire);
   }
-
-  [[nodiscard]] std::size_t recoverable_records() {
-    std::size_t count = 0;
-    for (; count < capacity_; ++count) {
-      auto& record = records_[count];
-      const auto committed =
-          std::atomic_ref(record.committed_sequence).load(std::memory_order_acquire);
-      if (committed != count + 1 || record.checksum != checksum(record)) break;
-    }
-    return count;
-  }
-
  private:
-  void signal_flusher() noexcept {
-    if (flush_pending_.exchange(true, std::memory_order_acq_rel)) return;
-    const std::uint64_t one = 1;
-    const auto ignored = ::write(notify_fd_, &one, sizeof(one));
-    (void)ignored;
+  [[noreturn]] static void fail(const char* what) {
+    throw std::system_error(errno,std::generic_category(),what);
   }
-
-  void flush_loop() noexcept {
-    std::uint64_t flushed = 0;
-    while (!stop_.load(std::memory_order_acquire)) {
-      pollfd descriptor{notify_fd_, POLLIN, 0};
-      (void)::poll(&descriptor, 1, 100);
-      std::uint64_t signals{};
-      while (::read(notify_fd_, &signals, sizeof(signals)) == sizeof(signals)) {
-      }
-      const auto target = committed_.load(std::memory_order_acquire);
-      if (target != flushed) {
-        (void)::msync(mapping_, mapped_bytes_, MS_ASYNC);
-        flushed = target;
-      }
-      flush_pending_.store(false, std::memory_order_release);
-      if (committed_.load(std::memory_order_acquire) - flushed >= flush_batch_) {
-        signal_flusher();
-      }
+  void check_error() {
+    if(const int e=error_.load(std::memory_order_acquire))
+      throw std::system_error(e,std::generic_category(),"journal worker");
+  }
+  void notify() noexcept {
+    const std::uint64_t one=1;
+    for(;;) {
+      if(::write(event_,&one,sizeof(one))==sizeof(one)) return;
+      if(errno==EINTR) continue;
+      if(errno!=EAGAIN) error_.store(errno,std::memory_order_release);
+      return; // EAGAIN means a notification is already pending
     }
   }
-
-  int fd_{-1};
-  int notify_fd_{-1};
-  void* mapping_{MAP_FAILED};
-  std::size_t mapped_bytes_{};
-  std::size_t capacity_{};
-  std::size_t flush_batch_{};
-  std::size_t next_{0};
-  JournalHeader* header_{};
-  JournalRecord* records_{};
-  std::atomic<std::uint64_t> committed_{0};
-  std::atomic<bool> flush_pending_{false};
-  std::atomic<bool> stop_{false};
-  std::thread flusher_{};
-};
-
-}  // namespace
-
-int main(int argc, char** argv) {
-  const char* path = argc > 1 ? argv[1] : "market.journal";
-  constexpr std::size_t count = 1'000'000;
-  MmapJournal journal(path, count);
-  const auto start = std::chrono::steady_clock::now();
-  for (std::size_t i = 1; i <= count; ++i) {
-    if (!journal.append(i, 1, "BID 10000 10")) return 1;
+  void flush_loop() noexcept {
+    for(;;) {
+      pollfd p{event_,POLLIN,0};
+      const int ready=::poll(&p,1,50);
+      if(ready<0 && errno!=EINTR) {error_.store(errno);return;}
+      std::uint64_t count=0;
+      while(::read(event_,&count,sizeof(count))<0 && errno==EINTR) {}
+      // Read stop first: acquiring the final stop publication also orders the
+      // final published watermark. Reading target first could lose the tail.
+      const bool stopping=stop_.load(std::memory_order_acquire);
+      const auto target=published_.load(std::memory_order_acquire);
+      if(target>durable_.load(std::memory_order_relaxed)) {
+        if(::msync(mapping_,64+target*64,MS_SYNC)<0) {error_.store(errno);return;}
+        durable_.store(target,std::memory_order_release);
+      }
+      if(stopping) return;
+    }
   }
-  const auto seconds = std::chrono::duration<double>(
-                           std::chrono::steady_clock::now() - start)
-                           .count();
-  std::cout << "records=" << journal.recoverable_records()
-            << " append_rate=" << count / seconds / 1e6 << " Mrec/s\n";
+  void stop() noexcept {
+    if(closed_) return;
+    closed_=true;
+    stop_.store(true,std::memory_order_release);
+    if(event_>=0) notify();
+    if(worker_.joinable()) worker_.join();
+  }
+  void cleanup() noexcept {
+    if(mapping_!=MAP_FAILED) ::munmap(mapping_,bytes_);
+    if(event_>=0) ::close(event_);
+    if(fd_>=0) ::close(fd_);
+  }
+  int fd_{-1},event_{-1};
+  void* mapping_{MAP_FAILED};
+  std::size_t capacity_,bytes_{},next_{};
+  bool closed_{false};
+  std::atomic<bool> stop_{false};
+  std::atomic<int> error_{0};
+  std::atomic<std::uint64_t> published_{0},durable_{0};
+  std::thread worker_;
+};
 }
+
+int main(int argc,char** argv) try {
+  if(argc!=3) {std::cerr<<"usage: journal_demo create|recover PATH\n";return 2;}
+  if(std::string_view(argv[1])=="recover") {
+    std::ifstream file(argv[2],std::ios::binary);
+    const auto r=ll::journal::recover(file);
+    std::cout<<"valid_prefix="<<r.records<<" stopped_at_invalid_tail="<<r.invalid_tail<<'\n';
+  } else if(std::string_view(argv[1])=="create") {
+    Journal j(argv[2],1000000);
+    const auto start=std::chrono::steady_clock::now();
+    for(int i=0;i<1000000;++i) j.append(1,"BID 10000 10");
+    const auto appended=std::chrono::steady_clock::now();
+    const auto durable=j.close();
+    const auto synced=std::chrono::steady_clock::now();
+    std::cout<<"published=1000000 durable="<<durable
+      <<" append_seconds="<<std::chrono::duration<double>(appended-start).count()
+      <<" including_close_seconds="<<std::chrono::duration<double>(synced-start).count()<<'\n';
+  } else return 2;
+} catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}

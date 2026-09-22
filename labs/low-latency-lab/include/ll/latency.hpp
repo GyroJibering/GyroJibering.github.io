@@ -14,6 +14,9 @@
 #endif
 #endif
 #if defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 
@@ -21,9 +24,11 @@ namespace ll {
 
 inline bool pin_current_thread(unsigned cpu) noexcept {
 #if defined(_WIN32)
+  if(cpu >= sizeof(std::uintptr_t)*8) return false;
   return ::SetThreadAffinityMask(::GetCurrentThread(),
                                  std::uintptr_t{1} << cpu) != 0;
 #elif defined(__linux__)
+  if(cpu >= CPU_SETSIZE) return false;
   cpu_set_t set;
   CPU_ZERO(&set);
   CPU_SET(cpu, &set);

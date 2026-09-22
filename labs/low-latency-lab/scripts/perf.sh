@@ -6,9 +6,12 @@ cmake -S . -B "$build_dir" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$build_dir" --parallel
 
 "$build_dir/stress"
-taskset -c 2,3 "$build_dir/benchmark"
-perf stat -r 10 -e cycles,instructions,branches,branch-misses,cache-references,cache-misses \
-  taskset -c 2,3 "$build_dir/benchmark"
+"$build_dir/research"
+# The benchmark discovers allowed CPU topology and checks every affinity call.
+# Whole-process counters include setup and multiple trials, not just queue ops.
+perf stat -r 10 -e cycles:u,instructions:u -- "$build_dir/benchmark" mpmc
+perf stat -r 10 -e context-switches,cpu-migrations,page-faults -- \
+  "$build_dir/benchmark" mpmc
 perf record -g --call-graph dwarf -o "$build_dir/perf.data" \
-  taskset -c 2,3 "$build_dir/trading_loop"
+  "$build_dir/trading_loop"
 perf report -i "$build_dir/perf.data"

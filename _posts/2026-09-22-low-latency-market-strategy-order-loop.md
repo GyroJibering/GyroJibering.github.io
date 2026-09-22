@@ -1,193 +1,315 @@
 ---
 layout: post
-title: "从行情到下单：一个可解释顺序与一致性的低延迟骨架"
+title: "行情到下单的一致性设计：完整盘口、广播背压与不可判定的发送窗口"
 date: 2026-09-22 00:40 +0800
 categories: [系统设计, 低延迟]
-tags: [订单簿, 行情广播, 交易系统, C++, 一致性]
+tags: [订单簿, 行情广播, 序列恢复, 事件重放, C++]
 permalink: /blog/low-latency-market-strategy-order-loop/
 toc: true
 ---
 
-最后把前面的队列、内存序、日志和测量放进一个具体系统：行情到达，更新订单簿，策略读取最新盘口，风控后产生订单。实验代码处理 100 万条行情，没有序号缺口，产生 50 万条顺序连续的订单意图。
+队列保证了消息从 A 安全到达 B，仍然不能保证 B 做出正确决策。消息可能来自一个有缺口的行情流，盘口可能已丢失深层价位，快照可能混合了两个时刻，而订单在重连后可能被发送两次。
 
-这不是一个可以连交易所的系统。它刻意保留核心约束，删掉协议细节，以便回答三个问题：订单簿如何组织？行情如何低延迟广播？顺序和一致性到底保证到什么范围？
+因此这篇文章从四个不变量推导一个简化交易回路：
 
-## 先定数据流和所有权
+1. 用于决策的盘口必须来自一个已知连续前缀；
+2. 一次决策读取的字段必须属于同一版不可变视图；
+3. 每个订单意图能追溯到其输入版本与策略版本；
+4. 发送状态不确定时，系统不得凭本地序号自称 exactly-once。
 
-```text
-Market feed
-    |
-    | SPSC<MarketUpdate>
-    v
-Book actor -- SPSC<TopOfBook> --> Strategy actor
-                                      |
-                                      | SPSC<OrderIntent>
-                                      v
-                               Risk / Order gateway
-                                      |
-                                      v
-                                  Exchange
+[可执行骨架](https://github.com/GyroJibering/GyroJibering.github.io/blob/main/labs/low-latency-lab/src/trading_loop.cpp)覆盖单品种合成行情的四线程传递。[订单簿实现](https://github.com/GyroJibering/GyroJibering.github.io/blob/main/labs/low-latency-lab/include/ll/market.hpp)新增容量失败、缺口隔离和事务式快照安装。下文会明确区分已实现部分与更完整的协议设计，不把架构图当作功能清单。
 
-Book actor --------> single-writer mmap journal
-Order gateway -----> single-writer mmap journal
-```
+## 1. 序号先属于流，再属于品种
 
-每个可变状态都有一个明确 owner：
+真实行情常常在一个 channel/session 上复用多个品种。若先按 symbol 分流，再让每个订单簿检查 seq == previous + 1，就会把其他品种的消息误判为丢包。
 
-- feed 线程只负责解码并赋予 feed sequence；
-- book 线程独占订单簿；
-- strategy 线程独占策略状态和 decision sequence；
-- order gateway 独占 session 状态与 order sequence；
-- journal writer 独占日志文件顺序。
-
-线程之间传递值，不共享可变订单簿。这样一致性主要由消息顺序表达，而不是由遍布代码的 mutex 表达。
-
-## 订单簿先问清行情语义
-
-“写一个订单簿”没有唯一答案。输入可能是：
-
-- 每档绝对数量更新；
-- 增量加减；
-- 按订单的 add/modify/cancel；
-- 周期 snapshot 加增量；
-- 多播 A/B line，允许乱序、重复和丢包。
-
-本实验选择最小模型：单品种、每档绝对数量、`quantity == 0` 删除、全流递增 sequence。它不是 L3 order-by-order book。
-
-价格用整数 ticks，绝不在匹配或风控逻辑中使用浮点。买卖两侧各用固定容量有序数组：bid 从高到低，ask 从低到高。更新一次最多移动 `Depth` 个元素，复杂度 O(Depth)，但无堆分配、内存连续，Depth 很小时常比树结构更适合热路径。
-
-如果要维护几千档或按订单撤单，需要换成更合适的索引：价格范围稳定时可以直接寻址；范围大时可以使用预分配节点池、稠密 top levels 加稀疏深层索引。选择依据是输入语义和工作集，不是看到“订单簿”就默认 `std::map`。
-
-## 缺口不是一条普通错误日志
-
-book actor 维护 `expected_sequence`：
-
-```cpp
-if (seq < expected) return stale; // 重复或迟到
-if (seq > expected) return gap;   // 丢包，当前状态不可再信
-apply(update);
-++expected;
-```
-
-检测 gap 后继续发布“最新盘口”是危险的，因为策略会在一个自洽但错误的世界里下单。生产系统应进入明确状态机：
+正确的层次是：
 
 ```text
-LIVE -> GAP_DETECTED -> SNAPSHOT_LOADING -> REPLAY_BUFFERED -> LIVE
+传输层接收与会话识别
+        |
+channel/session 级去重、排序、缺口恢复
+        |
+拆分并验证完整业务消息
+        |
+按 symbol 路由
+        |
+各品种订单簿单写者
 ```
 
-gap 期间缓存后续增量；取得带 sequence 的 snapshot；丢弃 snapshot 已覆盖的更新；严格连续地 replay；完成前不向策略发布可交易状态。缓存溢出或再次缺口则重新恢复。
+以 MoldUDP64 为具体例子，包头的 sequence 是包内第一条消息的序号，包内后续消息隐含连续编号；message count 为 0 是心跳，0xFFFF 是会话结束，不能把“一个包”机械当作“一次 seq++”。session 变化也不能仅靠比较 sequence 大小处理。[Nasdaq MoldUDP64 规范](https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/moldudp64.pdf)
 
-当前骨架在 gap 时停止应用该更新并计数，测试验证它能识别 stale 与 gap，但没有实现 snapshot recovery。这是有意暴露的边界。
+本文代码特意使用单品种、单会话、每次调用一条业务更新的合成流，因此 OrderBook 内部可以检查连续序号。这是模型的约束。把它用于真实多品种频道时，连续性检查必须上移；订单簿可以保留 source sequence 用于追溯，但不能要求每个品种的 source sequence 连续。
 
-## 广播不能用一个共享 MPMC 队列代替
+## 2. L2 与 L3 决定了完全不同的索引
 
-队列和广播语义不同。多个消费者从一个 MPMC queue `pop`，每条消息只交给其中一个消费者；行情广播要求每个订阅策略都看到属于自己的那一份流。
-
-简单而稳定的做法是每个订阅者一条 SPSC：
+本实现的更新语义是：
 
 ```text
-                     -> SPSC -> strategy A
-book publisher ------> SPSC -> strategy B
-                     -> SPSC -> recorder
+(side, price_ticks, absolute_quantity)
+quantity == 0 表示删除此价格档
 ```
 
-book 线程把不可变的 `TopOfBook` 值复制到各通道。优点是消费者互不争抢游标、单个消费者的读位置独立、顺序证明沿用 SPSC。代价是 fan-out 做 N 次复制，慢消费者会填满自己的队列。
+它是按价格聚合的 L2 模型。它不能用来推断某张具体订单的队列位置，也不能估算可见队列之外的隐藏流动性。
 
-队列满时必须预先定义策略：
-
-- **阻塞发布者**：无丢失，但一个慢策略拖慢所有订阅者；
-- **断开慢消费者**：主链路继续，慢策略进入 stale 状态并恢复；
-- **覆盖旧快照**：适合“只要最新状态”的数据，不适合必须逐条处理的增量；
-- **写入可重放日志**：消费者从可靠序号恢复，但恢复路径更复杂。
-
-实验选择阻塞自旋以保持所有消息，便于验证；生产交易系统通常不能让观察型消费者阻塞关键行情链路。
-
-## 一致性不是“所有线程同时看到一样”
-
-我给系统定义的是按分区的一致性：同一品种由一个 book owner 处理，book 输出严格继承 market sequence；一个 strategy owner 按接收顺序生成 decision sequence；order gateway 再生成 session 内 order sequence。
-
-每笔订单携带三层因果标识：
+L3 则至少需要以下关系：
 
 ```text
-market_sequence -> decision_sequence -> order_sequence
+order_id -> 订单节点 -> 价格档
+价格档 -> 同价订单链表/聚合数量
+价格索引 -> 最佳 bid/ask
 ```
 
-于是可以回答：这笔订单基于哪一版盘口、是哪次策略决策、在订单会话中排第几。SPSC 的 release/acquire 保证每一跳的数据可见性，单写者保证每层序号的总序。
+一个预分配实现可以用整数下标代替裸指针，以稳定的节点池存订单；撤单从 order_id 索引找到节点，更新档位数量并摘链；价格档清空后再从价格索引移除。若池槽位循环复用，外部句柄还需要 generation，防止旧引用指向新订单。
 
-这没有创造跨所有品种和所有机器的全球总序。若多品种按 symbol 分区，不同分区只能依赖接收时间或外部序号做部分序合并。用 wall clock 强行宣称全局精确顺序通常不成立；需要跨分区原子视图的策略，应明确 barrier、watermark 或撮合端 sequence 的代价。
+更改规则必须来自具体协议。例如 Nasdaq ITCH 的 replace 带有新的订单引用号，不能只修改原节点价格然后继续保留旧 ID；删除和部分撤销的含义也不同。[TotalView-ITCH 5.0 的订单消息定义](https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification_5.0.pdf)
 
-## 骨架如何运行
+所以“固定数组比树快”不能作为全部订单簿的结论。要先明确输入模型、最大存活订单数、价格密度和可接受的失败行为。
 
-四个线程分别执行 feed、book、strategy、order gateway：
+## 3. 旧实现为什么会在删档后给出错误答案
 
-```cpp
-MarketUpdate update{seq, tsc, price, qty, side};
-feed_to_book.try_push(update);
-
-book.apply(update);
-book_to_strategy.try_push(book.top());
-
-OrderIntent intent{decision_seq, top.market_sequence, ...};
-strategy_to_orders.try_push(intent);
-
-NewOrder order{order_seq, intent.decision_sequence,
-               intent.market_sequence, ...};
-```
-
-`TopOfBook` 按值传递，策略永远拿不到订单簿内部引用。热路径数据结构在启动时完成分配；价格和数量是固定宽度整数；消息类型没有虚函数和字符串。
-
-一次实测结果：
+设一个买侧数组只能容纳两档，却接收完整深度增量：
 
 ```text
-updates=1000000 gaps=0 orders=500000
+1. add 100 -> [100]
+2. add  99 -> [100, 99]
+3. add  98 -> [100, 99]   // 把 98 静默丢弃
+4. del 100 -> [99]
+5. del  99 -> []          // 实际仍应存在 98
 ```
 
-测试行情交替更新 bid/ask，每次 ask 更新形成完整两边盘口，策略产生一个买单意图，因此订单数应精确等于 50 万。order gateway 同时检查 decision sequence 必须逐一递增。
+只要后续消息不会重新发送 98，这个错误就不会自己恢复。算法在每次插入后确实保存了“当时最好的两档”，却没有足够信息维护未来的最优价。
 
-## 过程中遇到的典型问题
+这不是把 Depth 从 16 改成 32 就能解决的设计问题。合法方案只有明确选择其中一种：
 
-### 1. 把吞吐当延迟
+- 保存全部可见档位，并把容量耗尽当成错误；
+- 输入协议本来就提供可独立恢复的 top-N 快照或替补档机制；
+- 保留深层价位的辅助索引；
+- 失去完整性时停止发布，重新取得完整状态。
 
-最初在队列中堆积几千条消息再计算 `now - send_tsc`，测到的主要是排队。修复是一次只允许一条在途消息测交接延迟，另开实验测持续吞吐。
+修订实现选择第一种：容量是完整簿的硬限制，不是展示深度。新价格会超出容量时，返回 capacity，原状态不被部分修改，同时将簿标记为 quarantined。任何后续 delta 都不再应用，直到安装经过验证的新快照。
 
-### 2. Release build 关闭了测试
+确定性测试现在要求第三步报告容量失败，不能默默忽略。
 
-第一版用 `assert` 验证百万条结果，`-O3` 环境定义 `NDEBUG` 后断言被编译掉，甚至出现“变量未使用”警告。测试改为始终执行的 `require/abort`。基准编译成功不代表验证真的运行。
+## 4. 固定数组的成本可以明确估算
 
-### 3. 把 MPMC 当广播
+对 Depth = D 的一侧，绝对数量更新分为：
 
-MPMC 的多个消费者分摊消息，不会自动复制。广播改为每订阅者一条 SPSC，并单独设计慢消费者策略。
+1. 线性查找是否存在该价格；
+2. 若存在，移除旧位置；
+3. 若数量不为零，在有序位置插入并移动后缀。
 
-### 4. 用一个原子只证明半条生命周期
+这是 O(D) 操作，但访问连续。若 D = 32、每个 Level 因对齐占约 16 字节，单侧工作集约 512 字节；一次最坏移动是几个缓存行。这个量级说明为何小 D 值值得测试，不等于已经证明它胜过所有 O(log D) 结构。
 
-只通过 tail 发布元素，不足以证明生产者安全复用槽位。head 的 release/acquire 负责把“消费者已读取并析构”传回生产者。
+直接寻址数组适合稳定的 tick 范围，但价格区间很宽时浪费空间；平衡树减少比较次数，却可能增加指针追踪和不连续访问；稠密 top-of-book 加稀疏深度可以折中，但要证明两级迁移与最佳价维护。
 
-### 5. 把无 mutex 写成严格 lock-free
+价格使用整数 ticks，同时还需要在解码层验证比例、范围和字段宽度。数量为负直接拒绝。风控里的 price × quantity 必须采用检查过的宽类型或溢出检测，不能因为两个输入各自合法就认为乘积合法。
 
-有界 MPMC 中线程认领位置后暂停会形成 hole，因此文章和代码都明确不宣称正式 lock-free 进展保证。
+## 5. 缺口恢复需要隔离，而不是跳过一条消息
 
-### 6. 把内存可见当成日志持久
+本实现识别重复序号并返回 stale；检测到更大序号，进入隔离状态。隔离是一道锁存状态：后来补来 expected 那一条，也不会自动恢复 LIVE。
 
-release/acquire 解决线程间可见性，`mmap/msync` 和设备协议解决另外一层问题。两者必须分别测试和描述。
+原因是单条迟到更新不足以证明接下来整个缓冲区连续，也不足以撤销已经传播到策略的旧状态。更完整的恢复控制应是：
 
-## 离生产系统还有多远
+```text
+LIVE
+  | gap / capacity / invalid payload
+  v
+QUARANTINED
+  | 取得候选快照、收集后续增量
+  v
+BUILDING_SNAPSHOT
+  | 校验 session、snapshot sequence、档位与容量
+  v
+REPLAYING
+  | 从 S + 1 到选定恢复边界全部连续
+  v
+LIVE(new epoch)
+```
 
-下一阶段至少包括：
+假设正常处理至 100，先到达 103 和 104：
 
-- 真实行情协议解码、A/B line 仲裁和 snapshot recovery；
-- 每品种分区与跨品种 watermark；
-- 预交易风控：限价、限量、仓位、频率、自成交保护；
-- order session 登录、重连、重发与成交回报状态机；
-- CPU isolation、NUMA 固定、huge pages、预触页和实时调度评估；
-- Linux `perf`、火焰图、page fault、context switch 与 NIC 时间戳；
-- ThreadSanitizer、随机调度、断电/kill 恢复和长时间 soak test；
-- 明确 overload 时丢弃、降级、断开或停盘的策略。
+1. 记录缺口，停止可交易视图的发布；
+2. 暂存后续增量，去重键至少包含 session/channel/sequence；
+3. 获得同一会话、截至 S = 102 的完整快照；
+4. 在 staging book 安装快照；
+5. 丢弃缓存中不大于 102 的更新；
+6. 验证 103、104 连续并重放；
+7. 原子切换到新视图，递增 epoch，解除隔离。
 
-低延迟不是把每个数据结构都换成 CAS。更可靠的路线是先缩小共享状态、固定所有权和顺序，再对真正进入预算的环节测量。架构减少争用，内存序负责证明，基准负责反驳直觉。
+如果只有 104，不能跳过 103。缓冲区溢出时，恢复依赖已经失效，应重新取快照或扩大恢复范围，而不是继续带缺口重放。
 
-## 代码与记录
+代码中的 install_snapshot 只实现本地 staging 验证与替换：拒绝重复档位、非法数量、容量不足和倒退水位，验证全部通过才替换原簿。它不实现网络快照下载、session 判定和增量缓冲；这些属于上面的传输/恢复层。
 
-- [完整实验目录](https://github.com/GyroJibering/GyroJibering.github.io/tree/main/labs/low-latency-lab)
-- [固定深度订单簿与消息结构](https://github.com/GyroJibering/GyroJibering.github.io/blob/main/labs/low-latency-lab/include/ll/market.hpp)
-- [行情到下单核心骨架](https://github.com/GyroJibering/GyroJibering.github.io/blob/main/labs/low-latency-lab/src/trading_loop.cpp)
-- [本机原始结果记录](https://github.com/GyroJibering/GyroJibering.github.io/blob/main/labs/low-latency-lab/results/2026-09-22-windows.md)
+## 6. “有序执行”仍可能发布半个业务事件
+
+假设一次业务事件包含 bid 与 ask 两条更新。单写者按顺序处理它们，只能保证执行顺序，不能保证消费者不会看见只更新了 bid 的中间态。
+
+因此发布粒度必须来自协议：
+
+- 若每条消息都是独立状态转移，可以逐条发布；
+- 若一个事务、快照或事件需要多个消息，必须识别结束边界；
+- 不应仅因为“这次是 ask 更新”就认定盘口完整。
+
+demo 采用交替 bid/ask 合成数据，并在 ask 后发布，这是测试数据定义的成对边界。它不是可直接迁移到真实交易所的规则。
+
+修订后的 TopOfBook 包含 valid，要求簿未被隔离、两侧都有正数量、bid < ask。这里的 crossed/locked 过滤是演示策略的政策，不是普适行情协议：某些市场状态可能合法出现锁盘或交叉，生产系统需要按场所和交易阶段判断。
+
+## 7. 广播的核心问题是慢消费者
+
+一个 MPMC queue 的多个消费者分走消息，不能实现“每个策略都看到每条更新”。
+
+每个订阅者一条 SPSC 是最容易审查的基线：
+
+```text
+                     -> Q_A -> Strategy A
+Book owner ----------> Q_B -> Strategy B
+                     -> Q_R -> Recorder
+```
+
+值拷贝提供不可变视图，不需要让策略持有订单簿内部指针。代价可以用数量级估算：若更新率为 λ、每个视图 B 字节、订阅者 k 个，发布端仅 payload 写入量就约 λBk，尚未计算缓存一致性、游标和消费者读取。
+
+例如 λ = 100 万/秒，B = 64 字节，k = 8，则 payload 写入约 512 MB/s。这不是测量结果，而是用于判断复制成本是否值得进一步分析的算术下界。
+
+### 容量是在购买多少过载时间
+
+若消费者停止服务、到达率为 λ，容量 Q 大约只能容纳 Q/λ 秒的积压。Q = 4096、λ = 100 万/秒时仅约 4.096 ms。
+
+若消费者仍以 μ < λ 工作，忽略初始占用，预计填满时间为：
+
+```text
+t_fill ≈ Q / (λ - μ)
+```
+
+容量加倍延后溢出，却不改变 λ > μ 的长期不可持续性。增大队列还会增加允许积累的 stale 数据。选择容量必须同时约束最大排队时间和丢失/恢复策略。
+
+### 为什么不能简单覆盖旧槽位
+
+“只要最新快照”允许跳过中间版本，但不允许读到撕裂的 bid/ask 组合。直接让生产者覆盖消费者正在读取的普通 struct，会产生数据竞争。
+
+类似 seqlock 的“先读版本、读普通字段、再检查版本”也不能自动解决 ISO C++ 的 data race：第二次检查失败，不会追溯性地使刚才的无同步普通读变合法。
+
+可选实现是短锁、原子字段加经过证明的快照协议、具有读者占用管理的多缓冲，或者可靠队列加消费者侧丢弃。具体选择取决于是否允许漏过中间态、复制成本和读者数量，不是给普通 struct 加一个 version 就完成。
+
+## 8. 共享广播环减少复制，却增加回收证明
+
+另一个设计是一个单写者共享日志环，每个消费者有独立读位置 Ci。生产者能够复用槽位的条件变为：
+
+```text
+T - min(C0, C1, ..., Ck-1) < N
+```
+
+payload 只写一次，代价是最慢消费者决定可回收边界。动态注销消费者时，必须保证它不会继续读取旧指针，才能把它从 min 集合删除。
+
+若要踢掉慢消费者，不能只是“不再计算它的游标”。它可能正在读取马上被覆盖的槽位。需要停止确认、代际切换或其他 quiescence 协议。减少复制省下的开销，是用更复杂的生命周期管理换来的。
+
+对当前骨架，按值 SPSC 更容易约束；它不是宣称另一设计更差，而是以较小的共享状态换取可审查性。
+
+## 9. 序号应记录因果，不应冒充全局同时性
+
+更完整的消息元数据可以是：
+
+```text
+SourceKey  = (venue, channel, session, source_seq)
+BookKey    = (symbol, recovery_epoch, local_version)
+DecisionId = (strategy_instance, strategy_version, decision_seq)
+OrderId    = (account, order_session, client_order_id)
+```
+
+每个 Decision 保留使用过的 BookKey 和对应 SourceKey。这样能回答“这笔意图依据哪份输入”，也能在恢复后区分相同 local_version 所属的不同代际。
+
+多品种策略可能同时用到 A 的版本 100 和 B 的版本 87。两个数字没有天然可比较性。给每条消息带 wall-clock timestamp 也不会自动创造原子快照：时钟误差、网络延迟和事件生成时间都可能不同。
+
+若需要跨分区视图，应定义策略接受的 cut：例如两个分区都达到某个上游 barrier，或者使用事件时间 watermark 并承认迟到边界。等待 cut 越完整，通常引入越多延迟。代码中的三个整数序号只用于单流追溯，没有解决跨分区一致性。
+
+## 10. 隔离必须传到订单入口，不能只让 book 停发
+
+一个容易漏掉的执行历史是：
+
+```text
+策略已经收到旧盘口，生成意图 X
+book 随后发现行情缺口，停止发布
+X 仍在队列里，被 gateway 发送
+```
+
+仅让 TopOfBook.valid 变成 false，不能撤回已经排队的 X；甚至因为没有新视图，策略可能不知道自己已经 stale。
+
+完整协议需要一个由 gateway 管理的准入代际：恢复控制传递失效事件，gateway 在自己的单线程顺序里关闭旧 epoch 的新订单准入；策略意图携带 epoch，过期者拒绝。再次 LIVE 时通过明确的开启事件切到新 epoch。
+
+即使如此，保证的边界也是“gateway 处理关闭事件之后不再接受旧 epoch”，而不是“物理世界发生缺口的瞬间就没有任何发送”。已经发出的网络字节不能靠内存栅栏撤回。如果业务要求更强边界，需要在发送前建立更严格的序列化/确认协议，并承担额外等待。
+
+现有 trading_loop 没有集成这个控制面，所以它只用于演示顺序传递，不能作为异常行情下的完整停单系统。
+
+## 11. 下单回路中不可判定的窗口
+
+即使订单意图先持久化，也仍存在：
+
+```text
+持久化 intent
+发送 socket 字节
+交易所接收并处理
+本地接收 ACK
+持久化 ACK
+```
+
+进程在“交易所处理”之后、“本地持久化 ACK”之前崩溃，恢复后看到的是有 intent、无确认。它无法仅根据本地日志区分“根本没发出”和“已经成交但回报未记录”。
+
+盲目重发可能重复下单，盲目放弃可能丢单。因此需要 venue/session 的重发规则、稳定客户端订单标识和对账，而不是再加一个原子计数器。FIX 的重传标志属于具体会话协议，不能把一个 PossDupFlag 字段理解成任意业务层天然 exactly-once。[FIX NewOrderSingle 定义](https://fiximate.fixtrading.org/en/FIX.Latest/msg14.html)
+
+本地状态机至少需要区分：
+
+```text
+IntentRecorded -> SendAttempted -> Acknowledged -> Terminal
+                         |
+                         +-> Unknown（连接或进程故障后待核对）
+```
+
+Unknown 是一个必要状态，不是应当被“自动重试”隐藏的错误。
+
+## 12. 风控需要原子地占用额度
+
+假定最大允许敞口为 L，当前持仓为 P，已经发出但未完成的买单为 W，新意图数量为 q。一个简化的多头限额检查是 P + W + q <= L。
+
+若两个策略分别读取同一个 W，各自发现可用额度足够，再独立发送，就可能同时越过限制。风险状态应由一个 owner 串行接受意图，检查后立即把 q 计入预留额度，再进入发送阶段；撤单请求发出不等于撤单成功，额度释放应根据确认/终态协议处理。
+
+这是将“读检查”和“占用额度”组成同一个状态转移。是否使用无锁队列只是把意图送到 owner 的方式，不能取代这层业务原子性。
+
+骨架尚未维护持仓、未完成订单和成交回报，所以代码中的 OrderIntent 到 NewOrder 不是完成的风控模块。名称和文章都必须保留这条边界。
+
+## 13. 重放怎样成为一个有效测试
+
+可重放输入至少包括：已排序的行情、恢复代际、策略配置版本、定时器事件、外部风控开关和成交回报。依赖 wall-clock 的策略若只重放行情，会因不同的时钟调度得出不同决策。
+
+同样，多策略意图进入 gateway 的合并顺序也会影响风控额度。若不能从输入确定性重建这个顺序，就应记录 gateway 实际接受的顺序。
+
+当前测试实际覆盖：
+
+| 测试 | 证据 |
+|---|---|
+| 百万条单流传递 | 行情 100 万条，订单意图 50 万条，decision sequence 连续 |
+| 10 万条固定随机种子 L2 更新 | 每一步最佳价与数量同 std::map 参考实现一致 |
+| 两档容量反例 | 第三档触发 capacity，后续更新被隔离 |
+| gap 后补来旧缺口 | 不自动解除隔离 |
+| 快照包含重复价位 | 安装失败，原状态与水位保持不变 |
+| 有效快照 | 完整替换后 expected sequence = snapshot sequence + 1 |
+
+差分测试的种子为 20260922，价格空间每侧 24 档，容量为 32，持续包含添加、改量和删档。它检验算法的功能行为，不把 std::map 用作性能基线。
+
+尚未实现的是网络恢复、广播多订阅者控制、journal 接线、风险预留和交易所会话。四线程示例中的计数成功，只证明这条合成路径的一部分顺序约束。
+
+## 14. 延迟预算需要按真实边界观测
+
+真正的 feed-to-order 可以拆成：
+
+```text
+NIC 到达 -> 解码完成 -> 簿发布 -> 策略开始 -> 意图生成
+        -> 风控准入 -> socket/NIC 发送
+```
+
+每段分别包含服务时间和排队时间。代码里的 receive_tsc 是合成消息创建时刻，不是 NIC 时间戳；在用户态调用 send 的完成时间，也不等于最后一个字节离开网卡。
+
+闭环 ping-pong 适合观察交接成本，但它会在系统变慢时自动降低到达率，可能隐藏真实外部负载下的队列积压。评估行情突发需要另一套按预定时刻注入的 open-loop 负载，记录实际进入和预定进入之间的偏差，避免只测到了幸存请求的延迟。
+
+容量、广播副本、恢复状态与持久确认都应进入预算。先给某段代码贴上“纳秒级”标签，再把它拼成系统，无法得到端到端尾延迟保证。
+
+这个骨架提供的价值是把状态与失败边界写清楚：何时盘口不完整、哪一版视图可用、旧意图在哪个时刻停止准入、发送不确定如何进入待核对状态。只有这些语义确定之后，减少一个 CAS、一次复制或一次唤醒才有明确的优化目标。

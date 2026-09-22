@@ -1,0 +1,58 @@
+cpu=AMD Ryzen 5 9600X 6-Core Processor
+invariant_tsc=1
+hypervisor_present=0
+compiler=Clang 20.1.2 (https://github.com/ziglang/zig-bootstrap 7ef74e656cf8ddbd6bf891a8475892aa1afa6891)
+core=0:0 logical=0,1,
+core=0:1 logical=2,3,
+core=0:2 logical=4,5,
+core=0:3 logical=6,7,
+core=0:4 logical=8,9,
+core=0:5 logical=10,11,
+empty_bracket_TSC,p50=195,p99=195,max=814554
+TSC_MHz_estimate=3892.81
+RTT_TSC,rep=0,cpus=0:2,samples=1000000,min=429,p50=624,p99=780,p999=819,max=3771105
+throughput,spsc1024,rep=0,P=1,C=1,messages=1000000,seconds=0.0074132,Mmsg_s=134.895,sum=499999500000,empty_retries=10421,cpus=0:2:
+RTT_TSC,rep=0,cpus=0:1,samples=1000000,min=273,p50=351,p99=468,p999=468,max=797823
+RTT_TSC,rep=1,cpus=0:2,samples=1000000,min=390,p50=624,p99=741,p999=819,max=875940
+throughput,spsc1024,rep=1,P=1,C=1,messages=1000000,seconds=0.008142,Mmsg_s=122.82,sum=499999500000,empty_retries=1491,cpus=0:2:
+RTT_TSC,rep=1,cpus=0:1,samples=1000000,min=273,p50=351,p99=468,p999=468,max=808275
+RTT_TSC,rep=2,cpus=0:2,samples=1000000,min=429,p50=624,p99=780,p999=819,max=847353
+throughput,spsc1024,rep=2,P=1,C=1,messages=1000000,seconds=0.0086476,Mmsg_s=115.639,sum=499999500000,empty_retries=20137,cpus=0:2:
+RTT_TSC,rep=2,cpus=0:1,samples=1000000,min=273,p50=351,p99=468,p999=468,max=792831
+RTT_TSC,rep=3,cpus=0:2,samples=1000000,min=429,p50=663,p99=780,p999=819,max=682617
+throughput,spsc1024,rep=3,P=1,C=1,messages=1000000,seconds=0.008168,Mmsg_s=122.429,sum=499999500000,empty_retries=6558,cpus=0:2:
+RTT_TSC,rep=3,cpus=0:1,samples=1000000,min=273,p50=351,p99=468,p999=507,max=3160989
+RTT_TSC,rep=4,cpus=0:2,samples=1000000,min=429,p50=624,p99=780,p999=1092,max=3994107
+throughput,spsc1024,rep=4,P=1,C=1,messages=1000000,seconds=0.0082965,Mmsg_s=120.533,sum=499999500000,empty_retries=7752,cpus=0:2:
+RTT_TSC,rep=4,cpus=0:1,samples=1000000,min=273,p50=351,p99=468,p999=468,max=7853781
+throughput,warmup_mpmc,rep=-1,P=1,C=1,messages=1000000,seconds=0.0120982,Mmsg_s=82.6569,sum=499999500000,empty_retries=6316,cpus=0:2:
+throughput,mutex1024,rep=0,P=1,C=1,messages=1000000,seconds=0.0623171,Mmsg_s=16.047,sum=499999500000,empty_retries=57241,cpus=0:2:
+throughput,mpmc1024,rep=0,P=1,C=1,messages=1000000,seconds=0.0127017,Mmsg_s=78.7296,sum=499999500000,empty_retries=10052,cpus=0:2:
+throughput,mutex1024,rep=0,P=2,C=2,messages=2000000,seconds=0.121398,Mmsg_s=16.4748,sum=1999999000000,empty_retries=25356,cpus=0:2:4:6:
+throughput,mpmc1024,rep=0,P=2,C=2,messages=2000000,seconds=0.108059,Mmsg_s=18.5083,sum=1999999000000,empty_retries=16352,cpus=0:2:4:6:
+throughput,mutex1024,rep=0,P=4,C=4,messages=4000000,seconds=0.292701,Mmsg_s=13.6658,sum=7999998000000,empty_retries=32845,cpus=0:2:4:6:8:10:1:3:
+throughput,mpmc1024,rep=0,P=4,C=4,messages=4000000,seconds=0.212134,Mmsg_s=18.856,sum=7999998000000,empty_retries=37486,cpus=0:2:4:6:8:10:1:3:
+throughput,mpmc1024,rep=1,P=1,C=1,messages=1000000,seconds=0.0122519,Mmsg_s=81.62,sum=499999500000,empty_retries=9123,cpus=0:2:
+throughput,mutex1024,rep=1,P=1,C=1,messages=1000000,seconds=0.0558385,Mmsg_s=17.9088,sum=499999500000,empty_retries=22907,cpus=0:2:
+throughput,mpmc1024,rep=1,P=2,C=2,messages=2000000,seconds=0.0754353,Mmsg_s=26.5128,sum=1999999000000,empty_retries=51958,cpus=0:2:4:6:
+throughput,mutex1024,rep=1,P=2,C=2,messages=2000000,seconds=0.123652,Mmsg_s=16.1744,sum=1999999000000,empty_retries=29627,cpus=0:2:4:6:
+throughput,mpmc1024,rep=1,P=4,C=4,messages=4000000,seconds=0.215455,Mmsg_s=18.5654,sum=7999998000000,empty_retries=53819,cpus=0:2:4:6:8:10:1:3:
+throughput,mutex1024,rep=1,P=4,C=4,messages=4000000,seconds=0.29003,Mmsg_s=13.7917,sum=7999998000000,empty_retries=23149,cpus=0:2:4:6:8:10:1:3:
+throughput,mutex1024,rep=2,P=1,C=1,messages=1000000,seconds=0.0580202,Mmsg_s=17.2354,sum=499999500000,empty_retries=28683,cpus=0:2:
+throughput,mpmc1024,rep=2,P=1,C=1,messages=1000000,seconds=0.0119629,Mmsg_s=83.5918,sum=499999500000,empty_retries=9905,cpus=0:2:
+throughput,mutex1024,rep=2,P=2,C=2,messages=2000000,seconds=0.0986369,Mmsg_s=20.2764,sum=1999999000000,empty_retries=23868,cpus=0:2:4:6:
+throughput,mpmc1024,rep=2,P=2,C=2,messages=2000000,seconds=0.102804,Mmsg_s=19.4545,sum=1999999000000,empty_retries=6931,cpus=0:2:4:6:
+throughput,mutex1024,rep=2,P=4,C=4,messages=4000000,seconds=0.294117,Mmsg_s=13.6,sum=7999998000000,empty_retries=42537,cpus=0:2:4:6:8:10:1:3:
+throughput,mpmc1024,rep=2,P=4,C=4,messages=4000000,seconds=0.213689,Mmsg_s=18.7188,sum=7999998000000,empty_retries=119395,cpus=0:2:4:6:8:10:1:3:
+throughput,mpmc1024,rep=3,P=1,C=1,messages=1000000,seconds=0.0130127,Mmsg_s=76.848,sum=499999500000,empty_retries=14250,cpus=0:2:
+throughput,mutex1024,rep=3,P=1,C=1,messages=1000000,seconds=0.057981,Mmsg_s=17.247,sum=499999500000,empty_retries=17871,cpus=0:2:
+throughput,mpmc1024,rep=3,P=2,C=2,messages=2000000,seconds=0.104298,Mmsg_s=19.1759,sum=1999999000000,empty_retries=28741,cpus=0:2:4:6:
+throughput,mutex1024,rep=3,P=2,C=2,messages=2000000,seconds=0.134718,Mmsg_s=14.8458,sum=1999999000000,empty_retries=7897,cpus=0:2:4:6:
+throughput,mpmc1024,rep=3,P=4,C=4,messages=4000000,seconds=0.228781,Mmsg_s=17.4839,sum=7999998000000,empty_retries=55398,cpus=0:2:4:6:8:10:1:3:
+throughput,mutex1024,rep=3,P=4,C=4,messages=4000000,seconds=0.291719,Mmsg_s=13.7118,sum=7999998000000,empty_retries=23446,cpus=0:2:4:6:8:10:1:3:
+throughput,mutex1024,rep=4,P=1,C=1,messages=1000000,seconds=0.0571131,Mmsg_s=17.5091,sum=499999500000,empty_retries=71788,cpus=0:2:
+throughput,mpmc1024,rep=4,P=1,C=1,messages=1000000,seconds=0.0105961,Mmsg_s=94.3743,sum=499999500000,empty_retries=25643,cpus=0:2:
+throughput,mutex1024,rep=4,P=2,C=2,messages=2000000,seconds=0.133221,Mmsg_s=15.0126,sum=1999999000000,empty_retries=30318,cpus=0:2:4:6:
+throughput,mpmc1024,rep=4,P=2,C=2,messages=2000000,seconds=0.105162,Mmsg_s=19.0184,sum=1999999000000,empty_retries=3567,cpus=0:2:4:6:
+throughput,mutex1024,rep=4,P=4,C=4,messages=4000000,seconds=0.300055,Mmsg_s=13.3309,sum=7999998000000,empty_retries=31549,cpus=0:2:4:6:8:10:1:3:
+throughput,mpmc1024,rep=4,P=4,C=4,messages=4000000,seconds=0.212906,Mmsg_s=18.7877,sum=7999998000000,empty_retries=766313,cpus=0:2:4:6:8:10:1:3:
